@@ -16,21 +16,49 @@ const server = new ApolloServer({
   context: authMiddleware,
 });
 
+const { createServer } = require("http");
+const cors = require("cors")
+const {Server} = require('socket.io')
+
+app.use(cors())
+
+const socketServer = createServer(app)
+
+const io = new Server(socketServer, {
+  cors:{
+    origin:"http://localhost:3000",
+    methods: ["GET" , "POST"],
+  }
+})
+//socketServer.listen(4000)
+
+io.on("connection", (socket) => {
+  console.log(socket.id)
+
+  io.on("disconnect", () => {
+    console.log("User Disconnected: ", socket.id)
+  })
+
+})
+
 server.applyMiddleware({ app });
+
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
-}
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
+
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../client/build')));
+// }
+
+//app.get('*', (req, res) => {
+//  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+//});
 
 db.once('open', () => {
-  app.listen(PORT, () => {
+  socketServer.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);
     console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
   });

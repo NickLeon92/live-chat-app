@@ -8,6 +8,7 @@ import {
 import { setContext } from '@apollo/client/link/context';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import {Container} from 'react-bootstrap'
+import io from 'socket.io-client'
 
 import Home from './pages/Home';
 import Signup from './pages/Signup';
@@ -39,6 +40,8 @@ const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
+
+const socket = io.connect("http://localhost:3001")
 
 function App() {
   return (
