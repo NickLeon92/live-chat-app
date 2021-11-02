@@ -35,7 +35,17 @@ const io = new Server(socketServer, {
 io.on("connection", (socket) => {
   console.log(socket.id)
 
-  io.on("disconnect", () => {
+  socket.on("join_room", (data)=>{
+    socket.join(data)
+    console.log(`User: ${socket.id} has joined room: ${data}`)
+  })
+
+  socket.on("send_message", (data)=>{
+    console.log(data)
+    socket.to(data.room).emit("get_message", data)
+  })
+
+  socket.on("disconnect", () => {
     console.log("User Disconnected: ", socket.id)
   })
 
