@@ -25,22 +25,24 @@ function Chatbox({socket, myName, room}){
                 room: room,
             }
             await socket.emit("send_message", messageData)
+            if(messageData.room === room){
             setMessageHistory((item)=>[...item, messageData])
+            }
         }
     }
 
     useEffect (()=> {
         console.log('test')
         socket.on("get_message", (data) => {
+            if(data.room === room)
             setMessageHistory((item)=> 
-                [...item, data]
-            )
+                [...item, data])
         })
     }, [socket])
 
     return(
 
-        <Container>
+        <Container className="block-example border border-dark">
 
             <Container>
                 <h3>Room : {room}</h3>

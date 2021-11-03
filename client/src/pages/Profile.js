@@ -13,14 +13,14 @@ import Auth from '../utils/auth';
 const Profile = ({socket}) => {
   // console.log(Auth.getProfile().data.username)
 
-  const [room, setRoom] = useState('')
+  const [room, setRoom] = useState([])
   const roomRef = useRef()
 
   const joinRoom = () => {
     if(roomRef.current.value !== ''){
       socket.emit("join_room", roomRef.current.value)
     }
-    setRoom(roomRef.current.value)
+    setRoom((item)=> [ ...item, roomRef.current.value])
     
   }
 
@@ -50,7 +50,10 @@ const Profile = ({socket}) => {
       </Form.Group>
       </Form>
       <Button type="submit" onClick={joinRoom}>Join</Button>
-      <Chatbox socket={socket} myName = {user.username} room={room}/>
+      {room.map((room) => {
+        return(<Chatbox socket={socket} myName = {user.username} room={room}/>)
+      })}
+    
       </Container>
   );
   }
