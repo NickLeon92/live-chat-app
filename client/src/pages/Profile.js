@@ -1,17 +1,34 @@
 import React, { useState, useRef } from 'react';
 import { Redirect, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Container, Form, Button } from 'react-bootstrap';
 import Chatbox from '../components/Chatbox'
 
 
 
 import { QUERY_ME } from '../utils/queries';
+import { ADD_ROOM } from '../utils/mutations';
 
 import Auth from '../utils/auth';
 
 const Profile = ({socket}) => {
   // console.log(Auth.getProfile().data.username)
+
+  
+  const { loading, data } = useQuery(QUERY_ROOMS)
+
+  const roomData = data?.rooms || {}
+
+  console.log(roomData)
+
+  let runningList = []
+
+  const roomNameList = roomData.forEach(element => {
+      runningList.push(element.roomname)
+      
+  });
+
+  const[addRoom] = useMutation(ADD_ROOM)
 
   const [room, setRoom] = useState([])
   const roomRef = useRef()
@@ -21,6 +38,21 @@ const Profile = ({socket}) => {
       socket.emit("join_room", roomRef.current.value)
     }
     setRoom((item)=> [ ...item, roomRef.current.value])
+
+    if(runningList.includes(roomRef.current.value)){
+
+      try {
+        const { data } = await addRoom({
+          variables: { roomname: roomRef.current.value }
+        })
+      } catch (err) {
+        console.error(err)
+      }
+
+    }
+
+    
+
     
   }
 
@@ -31,7 +63,8 @@ const Profile = ({socket}) => {
   // redirect to personal profile page if username is yours
 
   if(Auth.loggedIn()){
-    const myName = ''
+    const name = user.username
+    console.log(`Welcome ${name}`)
   
   if (loading) {
     return <div>Loading...</div>

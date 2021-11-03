@@ -1,18 +1,21 @@
 const { AuthenticationError } = require('apollo-server-express');
-const { User, Thought } = require('../models');
+const { User, Room, Message } = require('../models');
 const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
     users: async () => {
-      return User.find();
+      return await User.find();
     },
     me: async (parent, args, context) => {
       if (context.user) {
-        return User.findOne({ _id: context.user._id });
+        return await User.findOne({ _id: context.user._id });
       }
       throw new AuthenticationError('You need to be logged in!');
     },
+    rooms: async (parent, args) => {
+      return await Room.find().populate('messages')
+    }
   },
 
   Mutation: {
@@ -38,6 +41,24 @@ const resolvers = {
 
       return { token, user };
     },
+    addRoom: async (parent, {roomname}) => {
+      return await Room.create({
+        roomname
+      })
+    },
+    addMessage: async (parent, {message, sender, roomname}) => {
+      const newMessage = await Message.create({
+        message,
+        sender,
+        roomname
+      })
+
+      return await Room.findOneAndUpdate(
+        {roomname: roomname},
+        { $addToSet: { messages: newMessage._id } }
+        )
+
+      }
     
   },
 };

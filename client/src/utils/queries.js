@@ -10,3 +10,17 @@ export const QUERY_ME = gql`
     }
   }
 `;
+
+export const QUERY_ROOMS = gql`
+  query rooms {
+    rooms {
+      _id
+      roomname
+      messages {
+        message
+        sender
+        roomname
+      }
+    }
+  }
+`;

@@ -8,6 +8,19 @@ const typeDefs = gql`
     password: String
   }
 
+  type Room {
+    _id: ID
+    roomname: String
+    messages: [Message]!
+  }
+
+  type Message {
+    _id: ID
+    message: String
+    sender: String
+    roomname: String
+  }
+
   type Auth {
     token: ID!
     user: User
@@ -16,11 +29,14 @@ const typeDefs = gql`
   type Query {
     users: [User]
     me: User
+    rooms: [Room]
   }
 
   type Mutation {
     addUser(username: String!, email: String!, password: String!): Auth
     login(email: String!, password: String!): Auth
+    addRoom(roomname: String!): Room
+    addMessage(message: String!, sender: String!, roomname: String!): Message
   }
 `;
 

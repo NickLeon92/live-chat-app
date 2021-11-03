@@ -1,5 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import {Container, InputGroup, FormControl, Button, Card} from 'react-bootstrap'
+import { useMutation, useQuery } from '@apollo/client';
+import { ADD_ROOM } from '../utils/mutations';
+import { ADD_MESSAGE } from '../utils/mutations';
+import { QUERY_ROOMS } from '../utils/queries';
 
 const styles = {
     headerStyle: {
@@ -11,10 +15,17 @@ const styles = {
 
 function Chatbox({socket, myName, room}){
 
-    console.log(`Welcome ${myName}`)
+    console.log(`Welcome to room: ${room}, ${myName}`)
+
 
     const [currentMessage, setCurrentMessage] = useState("")
     const [messageHistory, setMessageHistory] = useState([])
+
+    const [addRoom] = useMutation(ADD_ROOM)
+    const [addMessage] = useMutation(ADD_MESSAGE)
+
+
+
 
     const sendMessage = async () => {
         console.log(currentMessage)
@@ -27,6 +38,13 @@ function Chatbox({socket, myName, room}){
             await socket.emit("send_message", messageData)
             if(messageData.room === room){
             setMessageHistory((item)=>[...item, messageData])
+            }
+            try{
+                const { data } = await addMessage({
+                    variables: messageData
+                })
+            } catch(err) {
+                console.error(err)
             }
         }
     }
