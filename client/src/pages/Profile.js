@@ -7,6 +7,7 @@ import Chatbox from '../components/Chatbox'
 
 
 import { QUERY_ME } from '../utils/queries';
+import { QUERY_ROOMS } from '../utils/queries'
 import { ADD_ROOM } from '../utils/mutations';
 
 import Auth from '../utils/auth';
@@ -15,31 +16,28 @@ const Profile = ({socket}) => {
   // console.log(Auth.getProfile().data.username)
 
   
-  const { loading, data } = useQuery(QUERY_ROOMS)
+  const { nowloading, roomdata } = useQuery(QUERY_ROOMS)
 
-  const roomData = data?.rooms || {}
+  const roomData = roomdata?.rooms || {}
 
   console.log(roomData)
 
-  let runningList = []
+  // const roomNameList = roomData.map(element => { return element.roomname});
+  
 
-  const roomNameList = roomData.forEach(element => {
-      runningList.push(element.roomname)
-      
-  });
 
   const[addRoom] = useMutation(ADD_ROOM)
 
   const [room, setRoom] = useState([])
   const roomRef = useRef()
 
-  const joinRoom = () => {
+  const joinRoom = async () => {
     if(roomRef.current.value !== ''){
       socket.emit("join_room", roomRef.current.value)
     }
     setRoom((item)=> [ ...item, roomRef.current.value])
 
-    if(runningList.includes(roomRef.current.value)){
+    // if(roomNameList.includes(roomRef.current.value)){
 
       try {
         const { data } = await addRoom({
@@ -49,7 +47,7 @@ const Profile = ({socket}) => {
         console.error(err)
       }
 
-    }
+    // }
 
     
 

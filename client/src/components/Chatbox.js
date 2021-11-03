@@ -39,9 +39,14 @@ function Chatbox({socket, myName, room}){
             if(messageData.room === room){
             setMessageHistory((item)=>[...item, messageData])
             }
-            try{
+            try{ 
+                console.log('attempting to save message...')
                 const { data } = await addMessage({
-                    variables: messageData
+                    variables: {
+                        message: currentMessage,
+                        sender: myName,
+                        roomname: room
+                    }
                 })
             } catch(err) {
                 console.error(err)

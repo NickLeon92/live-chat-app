@@ -42,11 +42,13 @@ const resolvers = {
       return { token, user };
     },
     addRoom: async (parent, {roomname}) => {
+      console.log('attempting to save roomname..')
       return await Room.create({
         roomname
       })
     },
     addMessage: async (parent, {message, sender, roomname}) => {
+      console.log('attempting to save message..')
       const newMessage = await Message.create({
         message,
         sender,
