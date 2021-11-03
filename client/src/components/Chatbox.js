@@ -1,11 +1,20 @@
 import React, {useEffect, useState} from 'react'
-import {Container, InputGroup, FormControl, Button} from 'react-bootstrap'
+import {Container, InputGroup, FormControl, Button, Card} from 'react-bootstrap'
+
+const styles = {
+    headerStyle: {
+      display: 'flex',
+      justifyContent: 'right'
+    },
+    
+  };
 
 function Chatbox({socket, myName, room}){
 
     console.log(`Welcome ${myName}`)
 
-    const[currentMessage, setCurrentMessage] = useState("")
+    const [currentMessage, setCurrentMessage] = useState("")
+    const [messageHistory, setMessageHistory] = useState([])
 
     const sendMessage = async () => {
         console.log(currentMessage)
@@ -16,13 +25,16 @@ function Chatbox({socket, myName, room}){
                 room: room,
             }
             await socket.emit("send_message", messageData)
+            setMessageHistory((item)=>[...item, messageData])
         }
     }
 
     useEffect (()=> {
         console.log('test')
         socket.on("get_message", (data) => {
-            console.log(data)
+            setMessageHistory((item)=> 
+                [...item, data]
+            )
         })
     }, [socket])
 
@@ -31,11 +43,24 @@ function Chatbox({socket, myName, room}){
         <Container>
 
             <Container>
-                <h3>Realtime messeger</h3>
+                <h3>Room : {room}</h3>
             </Container>
 
             <Container>
-                <p></p>
+                {messageHistory.map((item)=>{
+                    return (
+                        <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>
+                        <Card style={{ width: '18rem' }}>
+                        <Card.Body>
+                          <Card.Title>{item.sender}</Card.Title>
+                          <Card.Text>
+                            {item.message}
+                          </Card.Text>
+                        </Card.Body>
+                      </Card>
+                      </div>
+                    )
+                })}
             </Container>
 
             <Container>

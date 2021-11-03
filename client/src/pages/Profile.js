@@ -38,7 +38,7 @@ const Profile = ({socket}) => {
   }
   
   return (
-    <Container className="align-items-center d-fllex">
+    <Container >
       <h4>
         Viewing your profile.
       </h4>
@@ -53,6 +53,9 @@ const Profile = ({socket}) => {
       <Chatbox socket={socket} myName = {user.username} room={room}/>
       </Container>
   );
+  }
+  else{
+    return <div>please log in</div>
   }
 }
 export default Profile;
