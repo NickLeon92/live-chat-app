@@ -6,11 +6,12 @@ import Chatbox from '../components/Chatbox'
 
 
 
-import { QUERY_USER, QUERY_ME } from '../utils/queries';
+import { QUERY_ME } from '../utils/queries';
 
 import Auth from '../utils/auth';
 
 const Profile = ({socket}) => {
+  // console.log(Auth.getProfile().data.username)
 
   const [room, setRoom] = useState('')
   const roomRef = useRef()
@@ -23,40 +24,23 @@ const Profile = ({socket}) => {
     
   }
 
-  const { username: userParam } = useParams();
+  const { loading, data } = useQuery( QUERY_ME);
 
-  const { loading, data } = useQuery(userParam ? QUERY_USER : QUERY_ME, {
-    variables: { username: userParam },
-  });
-
-  const user = data?.me || data?.user || {};
+  const user = data?.me || {};
+  
   // redirect to personal profile page if username is yours
-  if (Auth.loggedIn() && Auth.getProfile().data.username === userParam) {
-    return <Redirect to="/me" />;
-  }
 
-  if (!Auth.loggedIn()) {
-    return (
-      <h4>
-        You need to be logged in to see this. Use the navigation links above to
-        sign up or log in!
-      </h4>
-    );
-  }
-
+  if(Auth.loggedIn()){
+    const myName = ''
+  
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
-
-  const myName = Auth.getProfile().data.username
-
-
-
- 
-    return (
-      <Container className="align-items-center d-fllex">
+  
+  return (
+    <Container className="align-items-center d-fllex">
       <h4>
-        Viewing {userParam ? `${user.username}'s` : 'your'} profile.
+        Viewing your profile.
       </h4>
       <p>Join a room by entering it's name. Doesn't matter if it exists yet or not!</p>
       <Form>
@@ -66,10 +50,9 @@ const Profile = ({socket}) => {
       </Form.Group>
       </Form>
       <Button type="submit" onClick={joinRoom}>Join</Button>
-      <Chatbox socket={socket} myName = {myName} room={room}/>
+      <Chatbox socket={socket} myName = {user.username} room={room}/>
       </Container>
-    );
-
-};
-
+  );
+  }
+}
 export default Profile;

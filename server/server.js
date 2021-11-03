@@ -31,6 +31,7 @@ const io = new Server(socketServer, {
   }
 })
 //socketServer.listen(4000)
+let x =[];
 
 io.on("connection", (socket) => {
   console.log(socket.id)
@@ -43,6 +44,33 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data)=>{
     console.log(data)
     socket.to(data.room).emit("get_message", data)
+
+   const winner = (data) => {
+     if( x.length < 2 ){
+      x.push({data})
+      console.log(x)
+      if(x.length == 2){
+        let winner = ''
+        let first = x[0]
+        let second = x[1]
+        let firstScore = first.data.message.length
+        let secondScore = second.data.message.length
+        if(firstScore === secondScore){
+          winner = `tie`
+        }
+        if(firstScore > secondScore){
+          winner = `winner: ${first.data.sender}`
+        }
+        if(firstScore < secondScore){
+          winner = `winner: ${second.data.sender}`
+        }
+        console.log(winner)
+        x = [];
+      }}
+    }
+
+    winner(data)
+
   })
 
   socket.on("disconnect", () => {

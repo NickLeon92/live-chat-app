@@ -3,7 +3,7 @@ import {Container, InputGroup, FormControl, Button} from 'react-bootstrap'
 
 function Chatbox({socket, myName, room}){
 
-    // myMessage = getRef()
+    console.log(`Welcome ${myName}`)
 
     const[currentMessage, setCurrentMessage] = useState("")
 
