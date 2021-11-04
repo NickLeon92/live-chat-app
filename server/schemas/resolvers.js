@@ -41,11 +41,27 @@ const resolvers = {
 
       return { token, user };
     },
-    addRoom: async (parent, {roomname}) => {
+    addRoom: async (parent, {roomname}, context) => {
       console.log('attempting to save roomname..')
-      return await Room.create({
-        roomname
-      })
+      try{
+        // if(!await Room.findOne({roomname: roomname})){
+        //   const room = await Room.create({
+        //   roomname
+        //   })
+          if(context.user){
+          await User.findOneAndUpdate(
+            {_id: context.user._id},
+            {$addToSet: {rooms: roomname}}
+            )
+          }
+          
+        // }
+
+
+      }catch (err) {
+        console.log(err)
+      }
+      console.log('addroom resolver done')
     },
     addMessage: async (parent, {message, sender, roomname}) => {
       console.log('attempting to save message..')

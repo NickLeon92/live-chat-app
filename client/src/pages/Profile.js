@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Redirect, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/client';
 import { Container, Form, Button } from 'react-bootstrap';
@@ -11,34 +11,43 @@ import { QUERY_ROOMS } from '../utils/queries'
 import { ADD_ROOM } from '../utils/mutations';
 
 import Auth from '../utils/auth';
+import { removeArgumentsFromDocument } from '@apollo/client/utilities';
 
 const Profile = ({socket}) => {
   // console.log(Auth.getProfile().data.username)
+  const { loading, data } = useQuery( QUERY_ME);
 
+  const user = data?.me || {};
   
-  const { nowloading, roomdata } = useQuery(QUERY_ROOMS)
-
-  const roomData = roomdata?.rooms || {}
-
-  console.log(roomData)
-
-  // const roomNameList = roomData.map(element => { return element.roomname});
+  console.log(user)
+  // console.log(user.rooms)
   
-
-
   const[addRoom] = useMutation(ADD_ROOM)
-
-  const [room, setRoom] = useState([])
+  
+  let [room, setRoom] = useState([])
   const roomRef = useRef()
+  
+  
+  useEffect(()=>{
+
+    console.log()
+    
+    if(!loading){
+
+      setRoom(user.rooms)
+    }
+    
+    
+  },[user.rooms])
+
+  console.log(room)
 
   const joinRoom = async () => {
-    if(roomRef.current.value !== ''){
+    
+    if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
+      console.log(roomRef.current.value.length)
       socket.emit("join_room", roomRef.current.value)
-    }
-    setRoom((item)=> [ ...item, roomRef.current.value])
-
-    // if(roomNameList.includes(roomRef.current.value)){
-
+      setRoom((item)=> [ ...item, roomRef.current.value])
       try {
         const { data } = await addRoom({
           variables: { roomname: roomRef.current.value }
@@ -46,17 +55,11 @@ const Profile = ({socket}) => {
       } catch (err) {
         console.error(err)
       }
+    }
 
-    // }
 
-    
-
-    
   }
 
-  const { loading, data } = useQuery( QUERY_ME);
-
-  const user = data?.me || {};
   
   // redirect to personal profile page if username is yours
 
@@ -82,7 +85,11 @@ const Profile = ({socket}) => {
       </Form>
       <Button type="submit" onClick={joinRoom}>Join</Button>
       {room.map((room) => {
-        return(<Chatbox socket={socket} myName = {user.username} room={room}/>)
+        return (<Chatbox socket={socket} myName = {user.username} room={room}/>) 
+        // :
+
+        // <h1>no rooms yet</h1>
+
       })}
     
       </Container>
