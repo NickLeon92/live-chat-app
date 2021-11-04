@@ -91,7 +91,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
                 <CloseButton onClick={handleDelete} />
             </Container>
 
-            <Container>
+            <Container style={{height: '200px'}}>
                 {messageHistory.map((item)=>{
                     return (
                         <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>

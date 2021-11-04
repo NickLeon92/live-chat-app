@@ -43,19 +43,19 @@ const resolvers = {
     },
     addRoom: async (parent, {roomname}, context) => {
       console.log('attempting to save roomname..')
+      if(context.user){
+      await User.findOneAndUpdate(
+        {_id: context.user._id},
+        {$addToSet: {rooms: roomname}}
+        )
+      }
       try{
-        // if(!await Room.findOne({roomname: roomname})){
-        //   const room = await Room.create({
-        //   roomname
-        //   })
-          if(context.user){
-          await User.findOneAndUpdate(
-            {_id: context.user._id},
-            {$addToSet: {rooms: roomname}}
-            )
-          }
+        if(!await Room.findOne({roomname: roomname})){
+          const room = await Room.create({
+          roomname
+          })
           
-        // }
+        }
 
 
       }catch (err) {
