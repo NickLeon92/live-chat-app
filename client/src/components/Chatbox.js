@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {Container, InputGroup, FormControl, Button, Card, CloseButton} from 'react-bootstrap'
 import { useMutation, useQuery } from '@apollo/client';
 import { ADD_ROOM } from '../utils/mutations';
@@ -24,10 +24,15 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     const [addMessage] = useMutation(ADD_MESSAGE)
     const [removeRoom] = useMutation(REMOVE_ROOM)
 
+    const scrollDiv = useRef()
+
 
 
 
     const sendMessage = async () => {
+
+        
+        setCurrentMessage('')
         console.log(currentMessage)
         if (currentMessage !==""){
             const messageData = {
@@ -51,6 +56,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
             } catch(err) {
                 console.error(err)
             }
+            
         }
     }
 
@@ -91,7 +97,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
                 <CloseButton onClick={handleDelete} />
             </Container>
 
-            <Container style={{height: '200px'}}>
+            <Container ref={scrollDiv} style={{height: '200px', overflowY:'auto'}}>
                 {messageHistory.map((item)=>{
                     return (
                         <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>
@@ -115,6 +121,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
                         placeholder="Type your message here"
                         aria-label="message"
                         aria-describedby="basic-addon2"
+                        value = {currentMessage}
                     />
                     <Button 
                     onClick = {sendMessage}
