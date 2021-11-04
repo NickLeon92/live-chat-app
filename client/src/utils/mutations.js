@@ -40,4 +40,13 @@ export const ADD_MESSAGE = gql`
       roomname
     }
   }
+`
+
+export const REMOVE_ROOM = gql`
+  mutation removeRoom($roomname: String!) {
+    removeRoom(roomname: $roomname) {
+      username
+      rooms
+    }
+  }
 `;

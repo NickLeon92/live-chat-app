@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react'
-import {Container, InputGroup, FormControl, Button, Card} from 'react-bootstrap'
+import {Container, InputGroup, FormControl, Button, Card, CloseButton} from 'react-bootstrap'
 import { useMutation, useQuery } from '@apollo/client';
 import { ADD_ROOM } from '../utils/mutations';
-import { ADD_MESSAGE } from '../utils/mutations';
+import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
 import { QUERY_ROOMS } from '../utils/queries';
 
 const styles = {
@@ -13,7 +13,7 @@ const styles = {
     
   };
 
-function Chatbox({socket, myName, room}){
+function Chatbox({socket, myName, room, rooms, setRoom}){
 
     console.log(`Welcome to room: ${room}, ${myName}`)
 
@@ -21,8 +21,8 @@ function Chatbox({socket, myName, room}){
     const [currentMessage, setCurrentMessage] = useState("")
     const [messageHistory, setMessageHistory] = useState([])
 
-    const [addRoom] = useMutation(ADD_ROOM)
     const [addMessage] = useMutation(ADD_MESSAGE)
+    const [removeRoom] = useMutation(REMOVE_ROOM)
 
 
 
@@ -63,12 +63,32 @@ function Chatbox({socket, myName, room}){
         })
     }, [socket])
 
+    const handleDelete = async () => {
+        console.log(rooms)
+        const newRooms = rooms.filter(el => el !== room)
+        console.log(newRooms)
+        setRoom(newRooms)
+
+        try{ 
+            console.log('attempting to deleete message...')
+            const { data } = await removeRoom({
+                variables: {
+                    roomname: room
+                }
+            })
+        } catch(err) {
+            console.error(err)
+        }
+
+    }
+
     return(
 
         <Container className="block-example border border-dark">
 
-            <Container>
+            <Container style={{display:'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <h3>Room : {room}</h3>
+                <CloseButton onClick={handleDelete} />
             </Container>
 
             <Container>

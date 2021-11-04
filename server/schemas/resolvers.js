@@ -76,7 +76,22 @@ const resolvers = {
         { $addToSet: { messages: newMessage._id } }
         )
 
+      },
+    removeRoom: async (parent, {roomname}, context) => {
+      console.log('attempting to remove room from user...')
+      try{
+
+          if(context.user){
+          await User.findOneAndUpdate(
+            {_id: context.user._id},
+            {$pull: {rooms: roomname}}
+            )
+          }
+       
+      }catch (err) {
+        console.log(err)
       }
+    },
     
   },
 };

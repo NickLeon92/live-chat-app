@@ -38,6 +38,7 @@ const typeDefs = gql`
     login(email: String!, password: String!): Auth
     addRoom(roomname: String!): Room
     addMessage(message: String!, sender: String!, roomname: String!): Message
+    removeRoom(roomname: String): User
   }
 `;
 
