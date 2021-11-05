@@ -51,7 +51,7 @@ function App() {
           <Header />
           <div className="container">
             <Route exact path="/">
-              <Home />
+              <Home socket={socket}/>
             </Route>
             <Route exact path="/login">
               <Login />

@@ -12,8 +12,11 @@ import { ADD_ROOM } from '../utils/mutations';
 
 import Auth from '../utils/auth';
 import { removeArgumentsFromDocument } from '@apollo/client/utilities';
+// window.location.reload();
 
 const Profile = ({socket}) => {
+
+  
   // console.log(Auth.getProfile().data.username)
   const { loading, data } = useQuery( QUERY_ME);
 
