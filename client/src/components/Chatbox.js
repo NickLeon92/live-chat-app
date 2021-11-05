@@ -17,6 +17,9 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
 
     console.log(`Welcome to room: ${room}, ${myName}`)
 
+    const { loading, data } = useQuery(QUERY_ROOMS)
+
+    const roomData = data?.rooms || {}
 
     const [currentMessage, setCurrentMessage] = useState("")
     const [messageHistory, setMessageHistory] = useState([])
@@ -64,10 +67,27 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
         console.log('test')
         socket.on("get_message", (data) => {
             if(data.room === room)
+            console.log((item)=> 
+            [...item, data])
             setMessageHistory((item)=> 
                 [...item, data])
         })
+
+
     }, [socket])
+
+    useEffect (()=> {
+        console.log('test')
+
+        if(!loading){
+            const previousMessages = roomData.filter(el => el.roomname === room)
+            console.log(previousMessages)
+            setMessageHistory(previousMessages[0].messages)
+            console.log(messageHistory)
+        }
+
+        
+    }, [roomData])
 
     const handleDelete = async () => {
         console.log(rooms)
