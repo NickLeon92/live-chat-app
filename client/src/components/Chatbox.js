@@ -15,6 +15,8 @@ const styles = {
 
 function Chatbox({socket, myName, room, rooms, setRoom}){
 
+    socket.emit("join_room", room)
+
     console.log(`Welcome to room: ${room}, ${myName}`)
 
     const { loading, data } = useQuery(QUERY_ROOMS)
@@ -26,11 +28,6 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
 
     const [addMessage] = useMutation(ADD_MESSAGE)
     const [removeRoom] = useMutation(REMOVE_ROOM)
-
-    const scrollDiv = useRef()
-
-
-
 
     const sendMessage = async () => {
 
@@ -64,8 +61,9 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     }
 
     useEffect (()=> {
-        console.log('test')
+        console.log('socket use effect')
         socket.on("get_message", (data) => {
+            console.log('messsage recieved')
             if(data.room === room)
             console.log((item)=> 
             [...item, data])
@@ -77,12 +75,18 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     }, [socket])
 
     useEffect (()=> {
-        console.log('test')
+        console.log('room data use effect')
+
+        console.log(roomData)
+
+        let test = []
 
         if(!loading){
             const previousMessages = roomData.filter(el => el.roomname === room)
             console.log(previousMessages)
-            setMessageHistory(previousMessages[0].messages)
+            if(previousMessages.length > 0){
+                setMessageHistory(previousMessages[0].messages)
+            }
             console.log(messageHistory)
         }
 
@@ -96,7 +100,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
         setRoom(newRooms)
 
         try{ 
-            console.log('attempting to deleete message...')
+            console.log('attempting to deleete room...')
             const { data } = await removeRoom({
                 variables: {
                     roomname: room
@@ -117,7 +121,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
                 <CloseButton onClick={handleDelete} />
             </Container>
 
-            <Container ref={scrollDiv} style={{height: '200px', overflowY:'auto'}}>
+            <Container style={{height: '200px', overflowY:'auto'}}>
                 {messageHistory.map((item)=>{
                     return (
                         <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>

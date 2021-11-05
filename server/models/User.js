@@ -23,7 +23,7 @@ const userSchema = new Schema({
   rooms: [
     {
       type: String,
-      unique: true,
+
     }
   ]
   
