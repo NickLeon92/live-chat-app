@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react'
-import {Container, InputGroup, FormControl, Button, Card, CloseButton} from 'react-bootstrap'
+import {Container, InputGroup, FormControl, Button, Card, CloseButton, Alert} from 'react-bootstrap'
 import { useMutation, useQuery } from '@apollo/client';
 import { ADD_ROOM } from '../utils/mutations';
 import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
@@ -133,15 +133,18 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
                 {messageHistory.map((item)=>{
                     return (
                         <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {display:'flex', justifyContent: 'left'}}>
-                        <Card >
-                        <Card.Body>
-                          <Card.Title>{item.sender}</Card.Title>
-                          <Card.Text>
-                            {item.message}
-                          </Card.Text>
-                        </Card.Body>
-                      </Card>
-                      </div>
+                            { item.sender === myName? 
+                            <Alert style={{paddingBottom:'.25rem'}} variant={'success'}>
+                                <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
+                                <p>{item.message}</p>
+                            </Alert>
+                            :
+                            <Alert style={{paddingBottom:'.25rem'}} variant={'info'}>
+                                <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
+                                <p>{item.message}</p>
+                            </Alert>
+                            }
+                        </div>
                     )
                 })}
                 <div ref={dummyDiv}></div>

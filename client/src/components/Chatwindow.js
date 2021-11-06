@@ -1,5 +1,5 @@
 import React ,{useEffect, useRef} from 'react';
-import {Container, Card} from 'react-bootstrap'
+import {Container, Card, Alert} from 'react-bootstrap'
 
 
 
@@ -20,17 +20,14 @@ const Chatwindow = ({socket, roomdata, myName}) => {
         {messageHistory.map((item)=>{
                 return (
                     <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>
-                    <Card style={{ width: '18rem' }}>
-                    <Card.Body>
-                        <Card.Title>{item.sender}</Card.Title>
-                        <Card.Text>
-                        {item.message}
-                        </Card.Text>
-                    </Card.Body>
-                    </Card>
+                      <Alert style={{paddingBottom:'.25rem'}} variant={'success'}>
+                        <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
+                        <p>{item.message}</p>
+                    </Alert>
+
                     </div>
-                )
-            })}
+                     )
+                 })}
             <div ref={dummyDiv}></div>
       </Container>
     
