@@ -93,6 +93,12 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
         
     }, [roomData])
 
+    const dummyDiv = useRef(null)
+
+    useEffect(() => {
+        dummyDiv.current?.scrollIntoView()
+    }, [messageHistory])
+
     const handleDelete = async () => {
         console.log(rooms)
         const newRooms = rooms.filter(el => el !== room)
@@ -136,6 +142,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
                       </div>
                     )
                 })}
+                <div ref={dummyDiv}></div>
             </Container>
 
             <Container>
