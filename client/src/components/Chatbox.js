@@ -96,7 +96,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     const dummyDiv = useRef(null)
 
     useEffect(() => {
-        dummyDiv.current?.scrollIntoView()
+        dummyDiv.current?.scrollIntoView({behavior: 'smooth'})
     }, [messageHistory])
 
     const handleDelete = async () => {
