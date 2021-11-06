@@ -96,6 +96,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     const dummyDiv = useRef(null)
 
     useEffect(() => {
+        console.log('scroll effect')
         dummyDiv.current?.scrollIntoView({behavior: 'smooth'})
     }, [messageHistory])
 
@@ -120,18 +121,19 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
 
     return(
 
-        <Container className="block-example border border-dark">
+        <Container style={{width:'400px'}} className="block-example border border-dark">
 
             <Container style={{display:'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <h3>Room : {room}</h3>
                 <CloseButton onClick={handleDelete} />
             </Container>
 
-            <Container style={{height: '200px', overflowY:'auto'}}>
+            
+            <Container style={{height: '400px', overflowY:'auto'}}>
                 {messageHistory.map((item)=>{
                     return (
-                        <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>
-                        <Card style={{ width: '18rem' }}>
+                        <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {display:'flex', justifyContent: 'left'}}>
+                        <Card >
                         <Card.Body>
                           <Card.Title>{item.sender}</Card.Title>
                           <Card.Text>

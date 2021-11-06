@@ -87,13 +87,15 @@ const Profile = ({socket}) => {
       </Form.Group>
       </Form>
       <Button type="submit" onClick={joinRoom}>Join</Button>
-      {room.map((newroom) => {
-        return (<Chatbox socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom}/>) 
-        // :
+      <Container style ={{display:'flex', flexWrap: 'wrap'}}>
+        {room.map((newroom) => {
+          return (<Chatbox socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom}/>) 
+          // :
 
-        // <h1>no rooms yet</h1>
+          // <h1>no rooms yet</h1>
 
-      })}
+        })}
+      </Container>
     
       </Container>
   );
