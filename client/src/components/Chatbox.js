@@ -1,23 +1,16 @@
 import React, {useEffect, useState, useRef} from 'react'
-import {Container, InputGroup, FormControl, Button, Card, CloseButton, Alert} from 'react-bootstrap'
+import {Container, InputGroup, FormControl, Button, CloseButton, Alert} from 'react-bootstrap'
 import { useMutation, useQuery } from '@apollo/client';
-import { ADD_ROOM } from '../utils/mutations';
-import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
-import { QUERY_ROOMS } from '../utils/queries';
 
-const styles = {
-    headerStyle: {
-      display: 'flex',
-      justifyContent: 'right'
-    },
-    
-  };
+import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
+import { QUERY_ROOMS, QUERY_ME } from '../utils/queries';
+
 
 function Chatbox({socket, myName, room, rooms, setRoom}){
 
     socket.emit("join_room", room)
 
-    console.log(`Welcome to room: ${room}, ${myName}`)
+    // console.log(`Welcome to room: ${room}, ${myName}`)
 
     const { loading, data } = useQuery(QUERY_ROOMS)
 
@@ -27,13 +20,30 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     const [messageHistory, setMessageHistory] = useState([])
 
     const [addMessage] = useMutation(ADD_MESSAGE)
-    const [removeRoom] = useMutation(REMOVE_ROOM)
+    const [removeRoom] = useMutation(REMOVE_ROOM, {
+        // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
+        update(cache, { data: { removeRoom } }) {
+          try {
+            const { me } = cache.readQuery({ query: QUERY_ME });
+    
+            console.log(me)
+    
+            cache.writeQuery({
+              query: QUERY_ME,
+              data: { me: {rooms: room} },
+            });
+            
+          } catch (e) {
+            console.error(e);
+          }
+        },
+      })
 
     const sendMessage = async () => {
 
         
         setCurrentMessage('')
-        console.log(currentMessage)
+        // console.log(currentMessage)
         if (currentMessage !==""){
             const messageData = {
                 message: currentMessage,
@@ -61,12 +71,12 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     }
 
     useEffect (()=> {
-        console.log('socket use effect')
+        // console.log('socket use effect')
         socket.on("get_message", (data) => {
-            console.log('messsage recieved')
+            // console.log('messsage recieved')
             if(data.room === room)
-            console.log((item)=> 
-            [...item, data])
+            // console.log((item)=> 
+            // [...item, data])
             setMessageHistory((item)=> 
                 [...item, data])
         })
@@ -75,19 +85,18 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     }, [socket])
 
     useEffect (()=> {
-        console.log('room data use effect')
+        // console.log('room data use effect')
 
-        console.log(roomData)
+        // console.log(roomData)
 
-        let test = []
 
         if(!loading){
             const previousMessages = roomData.filter(el => el.roomname === room)
-            console.log(previousMessages)
+            // console.log(previousMessages)
             if(previousMessages.length > 0){
                 setMessageHistory(previousMessages[0].messages)
             }
-            console.log(messageHistory)
+            // console.log(messageHistory)
         }
 
         
@@ -96,18 +105,18 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
     const dummyDiv = useRef(null)
 
     useEffect(() => {
-        console.log('scroll effect')
+        // console.log('scroll effect')
         dummyDiv.current?.scrollIntoView({behavior: 'smooth'})
     }, [messageHistory])
 
     const handleDelete = async () => {
-        console.log(rooms)
+        // console.log(rooms)
         const newRooms = rooms.filter(el => el !== room)
-        console.log(newRooms)
+        // console.log(newRooms)
         setRoom(newRooms)
 
         try{ 
-            console.log('attempting to deleete room...')
+            // console.log('attempting to deleete room...')
             const { data } = await removeRoom({
                 variables: {
                     roomname: room
@@ -132,14 +141,14 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
             <Container style={{height: '400px', overflowY:'auto'}}>
                 {messageHistory.map((item)=>{
                     return (
-                        <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {display:'flex', justifyContent: 'left'}}>
+                        <div key={item._id} style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {display:'flex', justifyContent: 'left'}}>
                             { item.sender === myName? 
-                            <Alert style={{paddingBottom:'.25rem'}} variant={'success'}>
+                            <Alert ref={dummyDiv} style={{paddingBottom:'.25rem'}} variant={'success'}>
                                 <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
                                 <p>{item.message}</p>
                             </Alert>
                             :
-                            <Alert style={{paddingBottom:'.25rem'}} variant={'info'}>
+                            <Alert ref={dummyDiv} style={{paddingBottom:'.25rem'}} variant={'info'}>
                                 <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
                                 <p>{item.message}</p>
                             </Alert>
@@ -147,7 +156,7 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
                         </div>
                     )
                 })}
-                <div ref={dummyDiv}></div>
+
             </Container>
 
             <Container>

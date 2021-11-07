@@ -1,10 +1,10 @@
 import React ,{useEffect, useRef} from 'react';
-import {Container, Card, Alert} from 'react-bootstrap'
+import {Container, Alert} from 'react-bootstrap'
 
 
 
 const Chatwindow = ({socket, roomdata, myName}) => {
-    console.log(roomdata.messages)
+    // console.log(roomdata.messages)
 
     const messageHistory = roomdata.messages
 
@@ -16,11 +16,11 @@ const Chatwindow = ({socket, roomdata, myName}) => {
 
   return (
     
-      <Container style={{height: '200px', overflowY:'auto', border:'solid'}}>
+      <Container style={{height: '300px', overflowY:'auto', border:'solid'}}>
         {messageHistory.map((item)=>{
                 return (
-                    <div style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>
-                      <Alert style={{paddingBottom:'.25rem'}} variant={'success'}>
+                    <div key={item._id} style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {}}>
+                      <Alert ref={dummyDiv} style={{paddingBottom:'.25rem'}} variant={'success'}>
                         <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
                         <p>{item.message}</p>
                     </Alert>

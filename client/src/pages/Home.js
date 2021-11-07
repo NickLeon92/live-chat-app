@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client'
+
+import {  useQuery } from '@apollo/client'
 import { QUERY_ROOMS } from '../utils/queries'
 import Chatwindow from '../components/Chatwindow'
 import {Container} from 'react-bootstrap'
@@ -12,11 +12,11 @@ const Home = ({socket}) => {
   
   const roomData = data?.rooms || {}
 
-  console.log(roomData)
+  // console.log(roomData)
 
   if(Auth.loggedIn()){
     const name = Auth.getProfile().data.username
-    console.log(name)
+    // console.log(name)
   
   if (loading) {
     return <div>Loading...</div>
@@ -29,7 +29,7 @@ const Home = ({socket}) => {
         return (
   
           
-        <Container style={{border: 'solid', width: '400px'}}>
+        <Container key={singleRoomData._id} style={{border: 'solid', width: '400px'}}>
           <h1> Room: {singleRoomData.roomname} </h1>
           <Chatwindow socket={socket} roomdata={singleRoomData} myName={name}/>
         </Container>

@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Redirect, useParams } from 'react-router-dom';
+
 import { useMutation, useQuery } from '@apollo/client';
 import { Container, Form, Button } from 'react-bootstrap';
 import Chatbox from '../components/Chatbox'
 
 
 
-import { QUERY_ME } from '../utils/queries';
-import { QUERY_ROOMS } from '../utils/queries'
+import { QUERY_ME, QUERY_ROOMS } from '../utils/queries';
+
 import { ADD_ROOM } from '../utils/mutations';
 
 import Auth from '../utils/auth';
-import { removeArgumentsFromDocument } from '@apollo/client/utilities';
+
 // window.location.reload();
 
 const Profile = ({socket}) => {
@@ -22,10 +22,27 @@ const Profile = ({socket}) => {
 
   const user = data?.me || {};
   
-  console.log(user)
+  // console.log(user)
   // console.log(user.rooms)
   
-  const[addRoom] = useMutation(ADD_ROOM)
+  const[addRoom] = useMutation(ADD_ROOM, {
+    // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
+    update(cache, { data: { addRoom } }) {
+      try {
+        const { me } = cache.readQuery({ query: QUERY_ME });
+
+        console.log(me)
+
+        cache.writeQuery({
+          query: QUERY_ME,
+          data: { me: {rooms: room} },
+        });
+        
+      } catch (e) {
+        console.error(e);
+      }
+    },
+  })
   
   let [room, setRoom] = useState([])
   const roomRef = useRef()
@@ -33,24 +50,22 @@ const Profile = ({socket}) => {
   
   useEffect(()=>{
 
-    console.log()
+    console.log('calling room use effect')
     
     if(!loading){
 
       setRoom(user.rooms)
     }
-    
-    
-  },[user.rooms])
-
+     
+  }, [user])
+  
   console.log(room)
 
   const joinRoom = async () => {
     
     if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
-      console.log(roomRef.current.value.length)
+
       socket.emit("join_room", roomRef.current.value)
-      setRoom((item)=> [ ...item, roomRef.current.value])
       try {
         const { data } = await addRoom({
           variables: { roomname: roomRef.current.value }
@@ -59,6 +74,7 @@ const Profile = ({socket}) => {
         console.error(err)
       }
     }
+    setRoom((item)=> [ ...item, roomRef.current.value])
 
 
   }
@@ -68,7 +84,7 @@ const Profile = ({socket}) => {
 
   if(Auth.loggedIn()){
     const name = user.username
-    console.log(`Welcome ${name}`)
+
   
   if (loading) {
     return <div>Loading...</div>
@@ -89,7 +105,7 @@ const Profile = ({socket}) => {
       <Button type="submit" onClick={joinRoom}>Join</Button>
       <Container style ={{display:'flex', flexWrap: 'wrap'}}>
         {room.map((newroom) => {
-          return (<Chatbox socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom}/>) 
+          return (<Chatbox key={newroom} socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom}/>) 
           // :
 
           // <h1>no rooms yet</h1>
