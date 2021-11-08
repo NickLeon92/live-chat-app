@@ -60,7 +60,7 @@ function App() {
               <Signup />
             </Route>
             <Route exact path="/me">
-              <Profile socket={socket}/>
+              <Profile client={client} socket={socket}/>
             </Route>
           </div>
           <Footer />

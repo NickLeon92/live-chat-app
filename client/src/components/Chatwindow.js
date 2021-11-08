@@ -1,20 +1,44 @@
-import React ,{useEffect, useRef} from 'react';
-import {Container, Alert} from 'react-bootstrap'
-
-
+import React ,{useEffect, useRef } from 'react';
+import {Container, Alert, Button} from 'react-bootstrap'
+import { Link } from 'react-router-dom';
+import { ADD_ROOM } from '../utils/mutations';
+import { useMutation } from '@apollo/client';
 
 const Chatwindow = ({socket, roomdata, myName}) => {
     // console.log(roomdata.messages)
 
+    const [addRoom] = useMutation(ADD_ROOM)
+
     const messageHistory = roomdata.messages
 
     const dummyDiv = useRef(null)
+
+    const joinThisRoom = async () => {
+
+        console.log(roomdata.roomname)
+
+        try {
+            const { data } = await addRoom({
+                variables: { roomname: roomdata.roomname }
+            })
+        } catch (err) {
+            console.error(err)
+        }
+    }
 
     useEffect(() => {
         dummyDiv.current?.scrollIntoView()
     })
 
   return (
+
+    <Container>
+        <Link to='/me'>
+          <Button
+          onClick = {joinThisRoom}
+          >Join!
+          </Button>
+        </Link>
     
       <Container style={{height: '300px', overflowY:'auto', border:'solid'}}>
         {messageHistory.map((item)=>{
@@ -29,6 +53,8 @@ const Chatwindow = ({socket, roomdata, myName}) => {
                      )
                  })}
             <div ref={dummyDiv}></div>
+      </Container>
+
       </Container>
     
   );

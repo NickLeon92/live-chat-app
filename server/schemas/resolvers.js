@@ -15,6 +15,10 @@ const resolvers = {
     },
     rooms: async (parent, args) => {
       return await Room.find().populate('messages')
+    },
+    room: async (parent, args) => {
+      console.log(`searching for room: ${args.roomname}`)
+      return await Room.findOne({roomname: args.roomname}).populate('messages')
     }
   },
 
@@ -51,7 +55,7 @@ const resolvers = {
       }
       try{
         if(!await Room.findOne({roomname: roomname})){
-          const room = await Room.create({
+          return await Room.create({
           roomname
           })
           

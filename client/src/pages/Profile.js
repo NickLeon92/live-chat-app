@@ -14,15 +14,22 @@ import Auth from '../utils/auth';
 
 // window.location.reload();
 
-const Profile = ({socket}) => {
+const Profile = ({client, socket}) => {
 
+  let [room, setRoom] = useState([])
+
+  // console.log(room)
+
+  const me = client.readQuery({ query: QUERY_ME });
+
+  // console.log(me)
   
   // console.log(Auth.getProfile().data.username)
   const { loading, data } = useQuery( QUERY_ME);
 
   const user = data?.me || {};
   
-  // console.log(user)
+  console.log(user)
   // console.log(user.rooms)
   
   const[addRoom] = useMutation(ADD_ROOM, {
@@ -31,7 +38,8 @@ const Profile = ({socket}) => {
       try {
         const { me } = cache.readQuery({ query: QUERY_ME });
 
-        console.log(me)
+        // console.log(me)
+        // console.log(room)
 
         cache.writeQuery({
           query: QUERY_ME,
@@ -44,13 +52,12 @@ const Profile = ({socket}) => {
     },
   })
   
-  let [room, setRoom] = useState([])
   const roomRef = useRef()
   
   
   useEffect(()=>{
 
-    console.log('calling room use effect')
+    // console.log('calling room use effect')
     
     if(!loading){
 
@@ -59,12 +66,13 @@ const Profile = ({socket}) => {
      
   }, [user])
   
-  console.log(room)
+  // console.log(room)
 
   const joinRoom = async () => {
     
     if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
-
+      
+      setRoom((item)=> [ ...item, roomRef.current.value])
       socket.emit("join_room", roomRef.current.value)
       try {
         const { data } = await addRoom({
@@ -74,7 +82,6 @@ const Profile = ({socket}) => {
         console.error(err)
       }
     }
-    setRoom((item)=> [ ...item, roomRef.current.value])
 
 
   }
@@ -105,7 +112,7 @@ const Profile = ({socket}) => {
       <Button type="submit" onClick={joinRoom}>Join</Button>
       <Container style ={{display:'flex', flexWrap: 'wrap'}}>
         {room.map((newroom) => {
-          return (<Chatbox key={newroom} socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom}/>) 
+          return (<Chatbox key={newroom} socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom} client={client}/>) 
           // :
 
           // <h1>no rooms yet</h1>

@@ -3,23 +3,48 @@ import {Container, InputGroup, FormControl, Button, CloseButton, Alert} from 're
 import { useMutation, useQuery } from '@apollo/client';
 
 import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
-import { QUERY_ROOMS, QUERY_ME } from '../utils/queries';
+import { QUERY_ROOMS, QUERY_ME, QUERY_ROOM } from '../utils/queries';
 
 
-function Chatbox({socket, myName, room, rooms, setRoom}){
+function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
     socket.emit("join_room", room)
 
     // console.log(`Welcome to room: ${room}, ${myName}`)
 
-    const { loading, data } = useQuery(QUERY_ROOMS)
+    const { loading, data } = useQuery(QUERY_ROOM, {variables:{ roomname: room }})
 
-    const roomData = data?.rooms || {}
+    const roomData = data?.room || {}
+
+    console.log(roomData)
+
+    const thisRoom = client.readQuery({ query: QUERY_ROOM, variables:{ roomname: roomData.roomname } });
+    
+    console.log(thisRoom)
 
     const [currentMessage, setCurrentMessage] = useState("")
     const [messageHistory, setMessageHistory] = useState([])
-
     const [addMessage] = useMutation(ADD_MESSAGE)
+    //     , {
+    //     // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
+    //     update(cache, { data: { addMessage } }) {
+    //       try {
+    //         const { room } = cache.readQuery({ query: QUERY_ROOM, variables:{ roomname: roomData.roomname } });
+    
+    //         // console.log(room)
+    //         // console.log(messageHistory)
+    
+    //         cache.writeQuery({
+    //           query: QUERY_ROOM,
+    //           variables: { roomname: roomData.roomname },
+    //           data: { room: {messages: messageHistory} },
+    //         });
+            
+    //       } catch (e) {
+    //         console.error(e);
+    //       }
+    //     },
+    //   })
     const [removeRoom] = useMutation(REMOVE_ROOM, {
         // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
         update(cache, { data: { removeRoom } }) {
@@ -66,6 +91,11 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
             } catch(err) {
                 console.error(err)
             }
+            client.writeQuery({
+                query: QUERY_ROOM,
+                variables: { roomname: roomData.roomname },
+                data: { room: {messages: messageHistory} },
+              });
             
         }
     }
@@ -77,8 +107,13 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
             if(data.room === room)
             // console.log((item)=> 
             // [...item, data])
-            setMessageHistory((item)=> 
-                [...item, data])
+            setMessageHistory((item)=> [...item, data])
+            client.writeQuery({
+                query: QUERY_ME,
+                data: { me: {rooms: data} },
+              });
+
+
         })
 
 
@@ -91,11 +126,11 @@ function Chatbox({socket, myName, room, rooms, setRoom}){
 
 
         if(!loading){
-            const previousMessages = roomData.filter(el => el.roomname === room)
+            // const previousMessages = roomData.filter(el => el.roomname === room)
             // console.log(previousMessages)
-            if(previousMessages.length > 0){
-                setMessageHistory(previousMessages[0].messages)
-            }
+            // if(roomData){
+                setMessageHistory(roomData.messages)
+            // }
             // console.log(messageHistory)
         }
 

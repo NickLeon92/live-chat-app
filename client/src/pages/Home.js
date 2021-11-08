@@ -1,16 +1,21 @@
 
-import {  useQuery } from '@apollo/client'
+import {  useMutation, useQuery } from '@apollo/client'
 import { QUERY_ROOMS } from '../utils/queries'
+import { ADD_ROOM } from '../utils/mutations'
 import Chatwindow from '../components/Chatwindow'
-import {Container} from 'react-bootstrap'
+import {Container, Button} from 'react-bootstrap'
 import Auth from '../utils/auth';
+
+
 
 
 const Home = ({socket}) => {
 
+
   const { loading, data } = useQuery(QUERY_ROOMS)
   
   const roomData = data?.rooms || {}
+
 
   // console.log(roomData)
 
@@ -29,8 +34,10 @@ const Home = ({socket}) => {
         return (
   
           
-        <Container key={singleRoomData._id} style={{border: 'solid', width: '400px'}}>
+        <Container key={singleRoomData._id} style={{border: 'solid', width: '400px', marginTop:'3rem'}}>
           <h1> Room: {singleRoomData.roomname} </h1>
+
+          
           <Chatwindow socket={socket} roomdata={singleRoomData} myName={name}/>
         </Container>
   
