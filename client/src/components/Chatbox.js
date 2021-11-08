@@ -202,6 +202,7 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
                         aria-label="message"
                         aria-describedby="basic-addon2"
                         value = {currentMessage}
+                        onKeyPress = {(event) => {event.key === 'Enter' && sendMessage()}}
                     />
                     <Button 
                     onClick = {sendMessage}
