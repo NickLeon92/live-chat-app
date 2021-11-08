@@ -18,9 +18,15 @@ const Profile = ({client, socket}) => {
 
   let [room, setRoom] = useState([])
 
+  client.writeQuery({
+    query: QUERY_ME,
+    data: { me: {rooms: room} },
+  });
+  
+
   // console.log(room)
 
-  const me = client.readQuery({ query: QUERY_ME });
+  // const me = client.readQuery({ query: QUERY_ME });
 
   // console.log(me)
   
