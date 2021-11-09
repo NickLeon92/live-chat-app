@@ -63,7 +63,7 @@ function App() {
               <Profile client={client} socket={socket}/>
             </Route>
           </div>
-          <Footer />
+          {/* <Footer socket={socket}/> */}
          </Container>
       </Router>
     </ApolloProvider>

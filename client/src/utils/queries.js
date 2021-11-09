@@ -29,6 +29,7 @@ export const QUERY_ROOMS = gql`
       _id
       roomname
       messages {
+        _id
         message
         sender
         roomname
@@ -40,8 +41,10 @@ export const QUERY_ROOMS = gql`
 export const QUERY_ROOM = gql`
   query room ($roomname: String!) {
     room (roomname: $roomname) {
+      _id
       roomname
       messages {
+        _id
         message
         sender
         roomname

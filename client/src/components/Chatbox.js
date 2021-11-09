@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react'
-import {Container, InputGroup, FormControl, Button, CloseButton, Alert} from 'react-bootstrap'
+import {Container, InputGroup, FormControl, Button, CloseButton, Alert, DropdownButton, Dropdown} from 'react-bootstrap'
 import { useMutation, useQuery } from '@apollo/client';
 
 import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
@@ -8,7 +8,12 @@ import { QUERY_ROOMS, QUERY_ME, QUERY_ROOM } from '../utils/queries';
 
 function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
-    socket.emit("join_room", room)
+    const joinData = {
+        room: room,
+        name: myName
+    }
+
+    
 
     // console.log(`Welcome to room: ${room}, ${myName}`)
 
@@ -16,53 +21,34 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
     const roomData = data?.room || {}
 
-    console.log(roomData)
-
-    const thisRoom = client.readQuery({ query: QUERY_ROOM, variables:{ roomname: roomData.roomname } });
-    
-    console.log(thisRoom)
+    // console.log(roomData)
 
     const [currentMessage, setCurrentMessage] = useState("")
     const [messageHistory, setMessageHistory] = useState([])
+    const [onlineUsers, setOnlineUsers] = useState([])
     const [addMessage] = useMutation(ADD_MESSAGE)
+    const [removeRoom] = useMutation(REMOVE_ROOM
     //     , {
     //     // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
-    //     update(cache, { data: { addMessage } }) {
+    //     update(cache, { data: { removeRoom } }) {
     //       try {
-    //         const { room } = cache.readQuery({ query: QUERY_ROOM, variables:{ roomname: roomData.roomname } });
+    //         const { me } = cache.readQuery({ query: QUERY_ME });
     
-    //         // console.log(room)
-    //         // console.log(messageHistory)
+    //         console.log(me)
     
     //         cache.writeQuery({
-    //           query: QUERY_ROOM,
-    //           variables: { roomname: roomData.roomname },
-    //           data: { room: {messages: messageHistory} },
+    //           query: QUERY_ME,
+    //           data: { me: {rooms: room} },
     //         });
             
     //       } catch (e) {
     //         console.error(e);
     //       }
     //     },
-    //   })
-    const [removeRoom] = useMutation(REMOVE_ROOM, {
-        // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
-        update(cache, { data: { removeRoom } }) {
-          try {
-            const { me } = cache.readQuery({ query: QUERY_ME });
-    
-            console.log(me)
-    
-            cache.writeQuery({
-              query: QUERY_ME,
-              data: { me: {rooms: room} },
-            });
-            
-          } catch (e) {
-            console.error(e);
-          }
-        },
-      })
+    //   }
+      )
+
+    console.log(onlineUsers)
 
     const sendMessage = async () => {
 
@@ -109,10 +95,10 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
             // [...item, data])
             setMessageHistory((item)=> [...item, data])
             client.writeQuery({
-                query: QUERY_ME,
-                data: { me: {rooms: data} },
+                query: QUERY_ROOM,
+                variables: { roomname: roomData.roomname },
+                data: { room: {messages: messageHistory} },
               });
-
 
         })
 
@@ -135,6 +121,8 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
         }
 
         
+
+        
     }, [roomData])
 
     const dummyDiv = useRef(null)
@@ -143,6 +131,41 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
         // console.log('scroll effect')
         dummyDiv.current?.scrollIntoView({behavior: 'smooth'})
     }, [messageHistory])
+
+    useEffect(() => {
+
+        socket.on("ping_room", (data) => {
+            console.log(data)
+            socket.emit("return_ping", joinData)
+            const newOnlineUsers = onlineUsers.filter(el => el.socketID !== data.socketID)
+
+            if(data.roomname === room){
+                newOnlineUsers.push(data)
+                setOnlineUsers(newOnlineUsers)
+            }
+        })
+
+        socket.on("online_users", (data) => {
+            const newOnlineUsers = onlineUsers.filter(el => el.socketID !== data.socketID)
+
+            if(data.roomname === room){
+                newOnlineUsers.push(data)
+                setOnlineUsers(newOnlineUsers)
+            }
+        })
+
+        socket.on("disconnected_users", (data) => {
+            console.log('user disconnected')
+            console.log(`User with socketID: ${data} disconnected`)
+
+            
+            const newOnlineUsers = onlineUsers.filter(el => el.socketID !== data)
+            setOnlineUsers(newOnlineUsers)
+            
+        })
+
+    },[socket])
+
 
     const handleDelete = async () => {
         // console.log(rooms)
@@ -161,7 +184,13 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
             console.error(err)
         }
 
+        socket.emit("ping_leave", joinData)
+
     }
+
+    useEffect(() => {
+        socket.emit("join_room", joinData)
+    },[])
 
     return(
 
@@ -171,6 +200,14 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
                 <h3>Room : {room}</h3>
                 <CloseButton onClick={handleDelete} />
             </Container>
+
+            <DropdownButton variant={onlineUsers.length > 0 ?'success':'secondary'} id="dropdown-basic-button" title="Online Users">
+                {onlineUsers.map((user) => {
+                    return (
+                        <Dropdown.Item key={user.socketID}> 🟢 {user.username}</Dropdown.Item>
+                    )
+                })}
+            </DropdownButton>
 
             
             <Container style={{height: '400px', overflowY:'auto'}}>

@@ -37,43 +37,40 @@ io.on("connection", (socket) => {
   console.log(socket.id)
 
   socket.on("join_room", (data)=>{
-    socket.join(data)
-    console.log(`User: ${socket.id} has joined room: ${data}`)
+    socket.join(data.room)
+    console.log(`User: ${data.name}, socketID: ${socket.id} has joined room: ${data.room}`)
+    const userData = {
+      username: data.name,
+      socketID: socket.id,
+      roomname: data.room,
+    }
+    socket.to(data.room).emit("ping_room", userData)
+  })
+
+  socket.on("return_ping", (data) => {
+    console.log('pinging back')
+    const userData = {
+      username: data.name,
+      socketID: socket.id,
+      roomname: data.room,
+    }
+    socket.to(data.room).emit("online_users", userData)
   })
 
   socket.on("send_message", (data)=>{
     console.log(data)
     socket.to(data.room).emit("get_message", data)
 
-  //  const winner = (data) => {
-  //    if( x.length < 2 ){
-  //     x.push({data})
-  //     console.log(x)
-  //     if(x.length == 2){
-  //       let winner = ''
-  //       let first = x[0]
-  //       let second = x[1]
-  //       let firstScore = first.data.message.length
-  //       let secondScore = second.data.message.length
-  //       if(firstScore === secondScore){
-  //         winner = `tie`
-  //       }
-  //       if(firstScore > secondScore){
-  //         winner = `winner: ${first.data.sender}`
-  //       }
-  //       if(firstScore < secondScore){
-  //         winner = `winner: ${second.data.sender}`
-  //       }
-  //       console.log(winner)
-  //       x = [];
-  //     }}
-  //   }
+  })
 
-    // winner(data)
-
+  socket.on("ping_leave", (data) => {
+    console.log(`User: ${data.name}, socketID: ${socket.id} has left room ${data.room}`)
+    socket.to(data.room).emit("disconnected_users", socket.id)
+    
   })
 
   socket.on("disconnect", () => {
+    socket.broadcast.emit("disconnected_users", socket.id);
     console.log("User Disconnected: ", socket.id)
   })
 

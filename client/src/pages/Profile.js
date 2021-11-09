@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useMutation, useQuery } from '@apollo/client';
 import { Container, Form, Button } from 'react-bootstrap';
 import Chatbox from '../components/Chatbox'
+import Footer from '../components/Footer'
 
 
 
@@ -18,10 +20,24 @@ const Profile = ({client, socket}) => {
 
   let [room, setRoom] = useState([])
 
-  client.writeQuery({
-    query: QUERY_ME,
-    data: { me: {rooms: room} },
-  });
+
+  // const roomObjects = room.map(el => {
+  //   const container = {};
+
+  //   container.roomname = el
+  //   container.id = uuidv4()
+
+  //   return container
+  // })
+
+  // console.log(roomObjects)
+    
+  
+
+  // client.writeQuery({
+  //   query: QUERY_ME,
+  //   data: { me: {rooms: room} },
+  // });
   
 
   // console.log(room)
@@ -35,33 +51,40 @@ const Profile = ({client, socket}) => {
 
   const user = data?.me || {};
   
-  console.log(user)
+  // console.log(user)
   // console.log(user.rooms)
   
-  const[addRoom] = useMutation(ADD_ROOM, {
-    // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
-    update(cache, { data: { addRoom } }) {
-      try {
-        const { me } = cache.readQuery({ query: QUERY_ME });
+  const[addRoom] = useMutation(ADD_ROOM
+  //   , {
+  //   // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
+  //   update(cache, { data: { addRoom } }) {
+  //     try {
+  //       const { me } = cache.readQuery({ query: QUERY_ME });
 
-        // console.log(me)
-        // console.log(room)
+  //       // console.log(me)
+  //       // console.log(room)
 
-        cache.writeQuery({
-          query: QUERY_ME,
-          data: { me: {rooms: room} },
-        });
+  //       cache.writeQuery({
+  //         query: QUERY_ME,
+  //         data: { me: {rooms: room} },
+  //       });
         
-      } catch (e) {
-        console.error(e);
-      }
-    },
-  })
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //   },
+  // }
+  )
   
   const roomRef = useRef()
   
   
   useEffect(()=>{
+
+    client.writeQuery({
+    query: QUERY_ME,
+    data: { me: {rooms: room} },
+  });
 
     // console.log('calling room use effect')
     
@@ -79,7 +102,7 @@ const Profile = ({client, socket}) => {
     if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
       
       setRoom((item)=> [ ...item, roomRef.current.value])
-      socket.emit("join_room", roomRef.current.value)
+      // socket.emit("join_room", roomRef.current.value)
       try {
         const { data } = await addRoom({
           variables: { roomname: roomRef.current.value }
@@ -119,12 +142,11 @@ const Profile = ({client, socket}) => {
       <Container style ={{display:'flex', flexWrap: 'wrap'}}>
         {room.map((newroom) => {
           return (<Chatbox key={newroom} socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom} client={client}/>) 
-          // :
-
-          // <h1>no rooms yet</h1>
 
         })}
       </Container>
+
+      <Footer room={room} myName={user.username} socket={socket}/>
     
       </Container>
   );

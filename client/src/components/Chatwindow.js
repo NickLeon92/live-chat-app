@@ -11,6 +11,8 @@ const Chatwindow = ({socket, roomdata, myName}) => {
 
     const messageHistory = roomdata.messages
 
+    // console.log(messageHistory)
+
     const dummyDiv = useRef(null)
 
     const joinThisRoom = async () => {
