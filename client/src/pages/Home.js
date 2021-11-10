@@ -5,6 +5,7 @@ import { ADD_ROOM } from '../utils/mutations'
 import Chatwindow from '../components/Chatwindow'
 import {Container, Button} from 'react-bootstrap'
 import Auth from '../utils/auth';
+import { useEffect } from 'react'
 
 
 
@@ -15,6 +16,10 @@ const Home = ({socket}) => {
   const { loading, data } = useQuery(QUERY_ROOMS)
   
   const roomData = data?.rooms || {}
+
+  // useEffect(() => {
+  //   socket.emit('leave_rooms')
+  // },[])
 
 
   // console.log(roomData)

@@ -2,10 +2,16 @@ import React ,{useEffect, useRef } from 'react';
 import {Container, Alert, Button} from 'react-bootstrap'
 import { Link } from 'react-router-dom';
 import { ADD_ROOM } from '../utils/mutations';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
+import { QUERY_ME } from '../utils/queries';
 
 const Chatwindow = ({socket, roomdata, myName}) => {
     // console.log(roomdata.messages)
+
+    const { loading, data } = useQuery( QUERY_ME);
+
+    const user = data?.me || {};
+  
 
     const [addRoom] = useMutation(ADD_ROOM)
 
@@ -17,15 +23,16 @@ const Chatwindow = ({socket, roomdata, myName}) => {
 
     const joinThisRoom = async () => {
 
-        console.log(roomdata.roomname)
-
-        try {
-            const { data } = await addRoom({
-                variables: { roomname: roomdata.roomname }
-            })
-        } catch (err) {
-            console.error(err)
+        if(!user.rooms.includes(roomdata.roomname)){
+            try {
+                const { data } = await addRoom({
+                    variables: { roomname: roomdata.roomname }
+                })
+            } catch (err) {
+                console.error(err)
+            }
         }
+
     }
 
     useEffect(() => {

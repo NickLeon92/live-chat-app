@@ -17,9 +17,14 @@ import Auth from '../utils/auth';
 // window.location.reload();
 
 const Profile = ({client, socket}) => {
-
+  
   let [room, setRoom] = useState([])
-
+  
+  client.writeQuery({
+    query: QUERY_ME,
+    data: { me: {rooms: room} },
+  });
+  
   const { loading, data } = useQuery( QUERY_ME);
 
   const user = data?.me || {};
@@ -33,11 +38,6 @@ const Profile = ({client, socket}) => {
   
   
   useEffect(()=>{
-
-    client.writeQuery({
-    query: QUERY_ME,
-    data: { me: {rooms: room} },
-  });
 
     // console.log('calling room use effect')
     

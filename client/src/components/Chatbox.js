@@ -135,23 +135,37 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
     useEffect(() => {
 
         socket.on("ping_room", (data) => {
-            console.log(data)
-            socket.emit("return_ping", joinData)
-            const newOnlineUsers = onlineUsers.filter(el => el.socketID !== data.socketID)
 
             if(data.roomname === room){
-                newOnlineUsers.push(data)
-                setOnlineUsers(newOnlineUsers)
+
+                setOnlineUsers((item) => {
+                    console.log(item)
+                    const check = item.filter(el => el.socketID !== data.socketID)
+                    console.log(check, data)
+    
+                    return [...check, data]
+                })
+                joinData["socketID"] = data.socketID
+                socket.emit("return_ping", joinData)
             }
+
+
+            
         })
 
         socket.on("online_users", (data) => {
-            const newOnlineUsers = onlineUsers.filter(el => el.socketID !== data.socketID)
 
             if(data.roomname === room){
-                newOnlineUsers.push(data)
-                setOnlineUsers(newOnlineUsers)
+
+                setOnlineUsers((item) => {
+                    console.log(item)
+                    const check = item.filter(el => el.socketID !== data.socketID)
+                    console.log(check, data)
+    
+                    return [...check, data]
+                })
             }
+
         })
 
         socket.on("disconnected_users", (data) => {
@@ -160,7 +174,10 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
             
             const newOnlineUsers = onlineUsers.filter(el => el.socketID !== data)
-            setOnlineUsers(newOnlineUsers)
+            setOnlineUsers((item) => {
+                const check = item.filter(el => el.socketID !== data)
+                return check
+            })
             
         })
 
@@ -189,6 +206,7 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
     }
 
     useEffect(() => {
+        console.log(`user: ${joinData.name}, joining room: ${joinData.room}`)
         socket.emit("join_room", joinData)
     },[rooms])
 

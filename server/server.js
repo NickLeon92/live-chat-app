@@ -56,13 +56,7 @@ io.on("connection", (socket) => {
       roomname: data.room,
     }
     console.log(userData)
-    socket.to(data.room).emit("online_users", userData)
-  })
-
-  socket.on("send_message", (data)=>{
-    console.log(data)
-    socket.to(data.room).emit("get_message", data)
-
+    socket.to(data.socketID).emit("online_users", userData)
   })
 
   socket.on("ping_leave", (data) => {
@@ -71,6 +65,18 @@ io.on("connection", (socket) => {
     socket.leave(data.room)
     
   })
+  
+  socket.on("leave_rooms", () => {
+    socket.broadcast.emit("disconnected_users", socket.id);
+  })
+  
+
+  socket.on("send_message", (data)=>{
+    console.log(data)
+    socket.to(data.room).emit("get_message", data)
+    
+  })
+  
 
   socket.on("disconnect", () => {
     socket.broadcast.emit("disconnected_users", socket.id);
