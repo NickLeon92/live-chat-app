@@ -215,14 +215,14 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
                     return (
                         <div key={item._id} style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {display:'flex', justifyContent: 'left'}}>
                             { item.sender === myName? 
-                            <Alert ref={dummyDiv} style={{paddingBottom:'.25rem'}} variant={'success'}>
-                                <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
+                            <Alert ref={dummyDiv} style={{padding:'.5rem', paddingBottom:'0px', minWidth:'90px', maxWidth:'180px'}} variant={'success'}>
+                                <h4 style={{fontSize: '1rem', fontWeight:'bolder'}}>{item.sender}</h4>
                                 <p>{item.message}</p>
                             </Alert>
                             :
-                            <Alert ref={dummyDiv} style={{paddingBottom:'.25rem'}} variant={'info'}>
-                                <h4 style={{fontSize: '1.1rem'}}>{item.sender}</h4>
-                                <p>{item.message}</p>
+                            <Alert ref={dummyDiv} style={{padding:'.5rem', paddingBottom:'0px', minWidth:'90px', maxWidth:'180px'}} variant={'info'}>
+                                <h4 style={{fontSize: '1.1rem', fontWeight:'bolder'}}>{item.sender}</h4>
+                                <p style={{fontSize: '10px'}}>{item.message}</p>
                             </Alert>
                             }
                         </div>
