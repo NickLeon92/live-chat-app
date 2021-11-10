@@ -190,7 +190,7 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
     useEffect(() => {
         socket.emit("join_room", joinData)
-    },[])
+    },[rooms])
 
     return(
 
@@ -201,10 +201,10 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
                 <CloseButton onClick={handleDelete} />
             </Container>
 
-            <DropdownButton variant={onlineUsers.length > 0 ?'success':'secondary'} id="dropdown-basic-button" title="Online Users">
+            <DropdownButton variant={onlineUsers.length > 0 ?'success':'secondary'} id="dropdown-basic-button" title={onlineUsers.length === 0 ? 'No Users Online' : `Online Users: (${onlineUsers.length})`}>
                 {onlineUsers.map((user) => {
                     return (
-                        <Dropdown.Item key={user.socketID}> 🟢 {user.username}</Dropdown.Item>
+                        <Dropdown.Item key={user.socketID}> 🟢 -  {user.username}</Dropdown.Item>
                     )
                 })}
             </DropdownButton>

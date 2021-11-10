@@ -48,12 +48,14 @@ io.on("connection", (socket) => {
   })
 
   socket.on("return_ping", (data) => {
+    console.log(data)
     console.log('pinging back')
     const userData = {
       username: data.name,
       socketID: socket.id,
       roomname: data.room,
     }
+    console.log(userData)
     socket.to(data.room).emit("online_users", userData)
   })
 
@@ -66,6 +68,7 @@ io.on("connection", (socket) => {
   socket.on("ping_leave", (data) => {
     console.log(`User: ${data.name}, socketID: ${socket.id} has left room ${data.room}`)
     socket.to(data.room).emit("disconnected_users", socket.id)
+    socket.leave(data.room)
     
   })
 
