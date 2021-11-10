@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {Button} from 'react-bootstrap'
+import {Button, Container }  from 'react-bootstrap'
 
 const Footer = (room, myName, socket) => {
 
@@ -22,10 +22,10 @@ const Footer = (room, myName, socket) => {
   
 
   return (
-    <footer className="w-100 mt-auto bg-secondary p-4">
-      <div className="container text-center mb-5">
+    <Container style={{textAlign:'center', padding: '.5rem', background:'darkgrey', marginTop: '1rem'}}>
+      <Container>
         <Link to="/">
-        <Button
+        <Button style={{margin:'1rem'}}
           // onClick = {leaveRooms}
           >home
           </Button>
@@ -42,8 +42,8 @@ const Footer = (room, myName, socket) => {
           </span>{' '}
           by Nick Leon.
         </h4>
-      </div>
-    </footer>
+        </Container>
+      </Container>
   );
 };
 

@@ -20,33 +20,6 @@ const Profile = ({client, socket}) => {
 
   let [room, setRoom] = useState([])
 
-
-  // const roomObjects = room.map(el => {
-  //   const container = {};
-
-  //   container.roomname = el
-  //   container.id = uuidv4()
-
-  //   return container
-  // })
-
-  // console.log(roomObjects)
-    
-  
-
-  // client.writeQuery({
-  //   query: QUERY_ME,
-  //   data: { me: {rooms: room} },
-  // });
-  
-
-  // console.log(room)
-
-  // const me = client.readQuery({ query: QUERY_ME });
-
-  // console.log(me)
-  
-  // console.log(Auth.getProfile().data.username)
   const { loading, data } = useQuery( QUERY_ME);
 
   const user = data?.me || {};
@@ -54,27 +27,7 @@ const Profile = ({client, socket}) => {
   // console.log(user)
   // console.log(user.rooms)
   
-  const[addRoom] = useMutation(ADD_ROOM
-  //   , {
-  //   // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
-  //   update(cache, { data: { addRoom } }) {
-  //     try {
-  //       const { me } = cache.readQuery({ query: QUERY_ME });
-
-  //       // console.log(me)
-  //       // console.log(room)
-
-  //       cache.writeQuery({
-  //         query: QUERY_ME,
-  //         data: { me: {rooms: room} },
-  //       });
-        
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   },
-  // }
-  )
+  const[addRoom] = useMutation(ADD_ROOM)
   
   const roomRef = useRef()
   
@@ -128,27 +81,28 @@ const Profile = ({client, socket}) => {
   
   return (
     <Container >
-      <h4>
-        Viewing your profile.
-      </h4>
-      <p>Join a room by entering it's name. Doesn't matter if it exists yet or not!</p>
-      <Form>
-      <Form.Group>
-        <Form.Label>Enter a room name!</Form.Label>
-        <Form.Control ref={roomRef} type="text" required/>
-      </Form.Group>
-      </Form>
-      <Button type="submit" onClick={joinRoom}>Join</Button>
-      <Container style ={{display:'flex', flexWrap: 'wrap'}}>
+
+      <Container style={{display: 'flex', marginBottom:'1rem'}}>
+        <Form>
+          <Form.Group>
+            {/* <Form.Label>Enter a room name!</Form.Label> */}
+            <Form.Control placeholder='enter a room name' ref={roomRef} type="text" required />
+          </Form.Group>
+        </Form>
+
+        <Button type="submit" onClick={joinRoom}>Join</Button>
+      </Container>
+
+      <Container style={{ display: 'flex', flexWrap: 'wrap' }}>
         {room.map((newroom) => {
-          return (<Chatbox key={newroom} socket={socket} myName = {user.username} room={newroom} rooms = {room} setRoom = {setRoom} client={client}/>) 
+          return (<Chatbox key={newroom} socket={socket} myName={user.username} room={newroom} rooms={room} setRoom={setRoom} client={client} />)
 
         })}
       </Container>
 
-      <Footer room={room} myName={user.username} socket={socket}/>
-    
-      </Container>
+      {/* <Footer room={room} myName={user.username} socket={socket}/> */}
+
+    </Container>
   );
   }
   else{
