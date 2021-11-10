@@ -221,8 +221,8 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
                             </Alert>
                             :
                             <Alert ref={dummyDiv} style={{padding:'.5rem', paddingBottom:'0px', minWidth:'90px', maxWidth:'180px'}} variant={'info'}>
-                                <h4 style={{fontSize: '1.1rem', fontWeight:'bolder'}}>{item.sender}</h4>
-                                <p style={{fontSize: '10px'}}>{item.message}</p>
+                                <h4 style={{fontSize: '1rem', fontWeight:'bolder'}}>{item.sender}</h4>
+                                <p>{item.message}</p>
                             </Alert>
                             }
                         </div>
