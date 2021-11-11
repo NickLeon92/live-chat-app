@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ApolloClient,
   InMemoryCache,
@@ -16,6 +16,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Header from './components/Header';
 import Footer from './components/Footer';
+
 
 // Construct our main GraphQL API endpoint
 const httpLink = createHttpLink({
@@ -44,6 +45,9 @@ const client = new ApolloClient({
 const socket = io.connect("/")
 
 function App() {
+
+  const [displayChat, setDisplayChat] = useState([])
+
   return (
     <ApolloProvider client={client}>
       <Router>
@@ -51,7 +55,7 @@ function App() {
           <Header />
           <div className="container">
             <Route exact path="/">
-              <Home socket={socket}/>
+              <Home setDisplayChat={setDisplayChat} socket={socket}/>
             </Route>
             <Route exact path="/login">
               <Login />
@@ -60,7 +64,7 @@ function App() {
               <Signup />
             </Route>
             <Route exact path="/me">
-              <Profile client={client} socket={socket}/>
+              <Profile displayChat={displayChat} setDisplayChat={setDisplayChat} client={client} socket={socket}/>
             </Route>
           </div>
           <Footer/>

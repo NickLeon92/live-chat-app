@@ -10,7 +10,7 @@ import { useEffect } from 'react'
 
 
 
-const Home = ({socket}) => {
+const Home = ({setDisplayChat, socket}) => {
 
 
   const { loading, data } = useQuery(QUERY_ROOMS)
@@ -43,7 +43,7 @@ const Home = ({socket}) => {
           <h1> Room: {singleRoomData.roomname} </h1>
 
           
-          <Chatwindow socket={socket} roomdata={singleRoomData} myName={name}/>
+          <Chatwindow setDisplayChat={setDisplayChat} socket={socket} roomdata={singleRoomData} myName={name}/>
         </Container>
   
         )

@@ -179,7 +179,7 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
     useEffect(() => {
         console.log(`user: ${joinData.name}, joining room: ${joinData.room}`)
         socket.emit("join_room", joinData)
-    },[rooms])
+    },[])
 
     return(
 

@@ -8,7 +8,15 @@ import {Container, Button, ListGroup, Badge} from 'react-bootstrap'
 const Chat = ({setDisplayChat, socket, myName, room, rooms, setRoom, client}) => {
     const [removeRoom] = useMutation(REMOVE_ROOM)
 
+    const joinData = {
+        name: myName,
+        room: room
+      }
+
     const openChat = () => {
+
+
+        // socket.emit("join_room", joinData)
 
         setDisplayChat((item) => {
 
@@ -23,6 +31,7 @@ const Chat = ({setDisplayChat, socket, myName, room, rooms, setRoom, client}) =>
         // console.log(newRooms)
         setRoom(newRooms)
         console.log('leaving chat')
+        socket.emit("ping_leave", joinData)
         try{ 
             // console.log('attempting to deleete room...')
             const { data } = await removeRoom({

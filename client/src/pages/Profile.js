@@ -17,7 +17,7 @@ import Auth from '../utils/auth';
 
 // window.location.reload();
 
-const Profile = ({client, socket}) => {
+const Profile = ({displayChat, setDisplayChat, client, socket}) => {
   
   let [room, setRoom] = useState([])
 
@@ -26,7 +26,7 @@ const Profile = ({client, socket}) => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const [displayChat, setDisplayChat] = useState([])
+  
   
   client.writeQuery({
     query: QUERY_ME,
@@ -62,6 +62,11 @@ const Profile = ({client, socket}) => {
 
   const joinRoom = async () => {
     
+    const joinData = {
+      name: user.username,
+      room: roomRef.current.value
+    }
+
     if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
       
       // socket.emit("join_room", roomRef.current.value)
@@ -72,10 +77,15 @@ const Profile = ({client, socket}) => {
       } catch (err) {
         console.error(err)
       }
+      
+      setRoom((item)=> [ ...item, roomRef.current.value])
     }
-    
-    setRoom((item)=> [ ...item, roomRef.current.value])
-    setDisplayChat((item) => [...item, roomRef.current.value])
+    // socket.emit("join_room", joinData)
+    setDisplayChat((item) => {
+      const check = item.filter(el => el !== roomRef.current.value)
+      return [...check, roomRef.current.value]
+    })
+
 
   }
 
