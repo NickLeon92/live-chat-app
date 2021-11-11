@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useMutation, useQuery } from '@apollo/client';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Form, Button, Offcanvas, ListGroup, Badge } from 'react-bootstrap';
 import Chatbox from '../components/Chatbox'
+import Chat from '../components/Chat'
 import Footer from '../components/Footer'
 
 
@@ -19,6 +20,13 @@ import Auth from '../utils/auth';
 const Profile = ({client, socket}) => {
   
   let [room, setRoom] = useState([])
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const [displayChat, setDisplayChat] = useState([])
   
   client.writeQuery({
     query: QUERY_ME,
@@ -35,6 +43,8 @@ const Profile = ({client, socket}) => {
   const[addRoom] = useMutation(ADD_ROOM)
   
   const roomRef = useRef()
+
+  console.log(displayChat)
   
   
   useEffect(()=>{
@@ -65,6 +75,7 @@ const Profile = ({client, socket}) => {
     }
     
     setRoom((item)=> [ ...item, roomRef.current.value])
+    setDisplayChat((item) => [...item, roomRef.current.value])
 
   }
 
@@ -91,11 +102,29 @@ const Profile = ({client, socket}) => {
         </Form>
 
         <Button type="submit" onClick={joinRoom}>Join</Button>
+        <Button style={{marginLeft:'10px'}} variant="primary" onClick={handleShow}>
+        Room List
+        </Button>
+        
       </Container>
 
+      <Offcanvas show={show} onHide={handleClose}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Your Rooms</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+        <ListGroup as="ul">
+          {room.map((newroom) => {
+            return ( <Chat key={newroom} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={user.rooms} setRoom={setRoom} client={client} />
+                )
+          })}
+
+        </ListGroup>
+        </Offcanvas.Body>
+        </Offcanvas>
       <Container style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {room.map((newroom) => {
-          return (<Chatbox key={newroom} socket={socket} myName={user.username} room={newroom} rooms={room} setRoom={setRoom} client={client} />)
+        {displayChat.map((newroom) => {
+          return (<Chatbox key={newroom} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={room} setRoom={setRoom} client={client} />)
 
         })}
       </Container>

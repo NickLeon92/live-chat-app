@@ -6,7 +6,7 @@ import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
 import { QUERY_ROOMS, QUERY_ME, QUERY_ROOM } from '../utils/queries';
 
 
-function Chatbox({socket, myName, room, rooms, setRoom, client}){
+function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client}){
 
     const joinData = {
         room: room,
@@ -27,28 +27,9 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
     const [messageHistory, setMessageHistory] = useState([])
     const [onlineUsers, setOnlineUsers] = useState([])
     const [addMessage] = useMutation(ADD_MESSAGE)
-    const [removeRoom] = useMutation(REMOVE_ROOM
-    //     , {
-    //     // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
-    //     update(cache, { data: { removeRoom } }) {
-    //       try {
-    //         const { me } = cache.readQuery({ query: QUERY_ME });
-    
-    //         console.log(me)
-    
-    //         cache.writeQuery({
-    //           query: QUERY_ME,
-    //           data: { me: {rooms: room} },
-    //         });
-            
-    //       } catch (e) {
-    //         console.error(e);
-    //       }
-    //     },
-    //   }
-      )
+    const [removeRoom] = useMutation(REMOVE_ROOM)
 
-    console.log(onlineUsers)
+    // console.log(onlineUsers)
 
     const sendMessage = async () => {
 
@@ -185,21 +166,11 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
 
     const handleDelete = async () => {
-        // console.log(rooms)
-        const newRooms = rooms.filter(el => el !== room)
-        // console.log(newRooms)
-        setRoom(newRooms)
 
-        try{ 
-            // console.log('attempting to deleete room...')
-            const { data } = await removeRoom({
-                variables: {
-                    roomname: room
-                }
-            })
-        } catch(err) {
-            console.error(err)
-        }
+        setDisplayChat((item) => {
+            const check = item.filter(el => el !== room)
+            return check
+        })
 
         socket.emit("ping_leave", joinData)
 
