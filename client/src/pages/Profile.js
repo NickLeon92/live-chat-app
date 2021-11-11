@@ -54,7 +54,6 @@ const Profile = ({client, socket}) => {
     
     if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
       
-      setRoom((item)=> [ ...item, roomRef.current.value])
       // socket.emit("join_room", roomRef.current.value)
       try {
         const { data } = await addRoom({
@@ -64,7 +63,8 @@ const Profile = ({client, socket}) => {
         console.error(err)
       }
     }
-
+    
+    setRoom((item)=> [ ...item, roomRef.current.value])
 
   }
 

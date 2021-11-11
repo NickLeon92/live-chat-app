@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {Button, Container }  from 'react-bootstrap'
+import ScrollToTopBtn from "./ScrollToTop";
 
 const Footer = (room, myName, socket) => {
 
@@ -24,12 +25,17 @@ const Footer = (room, myName, socket) => {
   return (
     <Container style={{textAlign:'center', padding: '.5rem', background:'darkgrey', marginTop: '1rem'}}>
       <Container>
+
+      <div style={{display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:'center'}}>
         <Link to="/">
         <Button style={{margin:'1rem'}}
           // onClick = {leaveRooms}
           >home
-          </Button>
+        </Button>
         </Link>
+          <ScrollToTopBtn />
+      </div>
+
         <h4>
           Made with{' '}
           <span
