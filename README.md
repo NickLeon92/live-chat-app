@@ -12,8 +12,6 @@ here's the link to the deployed application: https://realtime-rooms.herokuapp.co
 
 <img src = ./images\demopic1.JPG>
 <img src = ./images\demopic2.JPG>
-
-<img src=''/>
     
 ## TABLE OF CONTENTS
 - [Installation](#installation)
