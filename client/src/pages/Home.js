@@ -40,7 +40,7 @@ const Home = ({setDisplayChat, socket}) => {
   
           
         <Container key={singleRoomData._id} style={{border: 'solid', width: '400px', marginTop:'3rem'}}>
-          <h1> Room: {singleRoomData.roomname} </h1>
+          <h1 style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow:'ellipsis'}}> Room: {singleRoomData.roomname} </h1>
 
           
           <Chatwindow setDisplayChat={setDisplayChat} socket={socket} roomdata={singleRoomData} myName={name}/>

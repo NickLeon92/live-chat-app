@@ -223,12 +223,12 @@ function Chatbox({displayChat, setDisplayChat, socket, myName, room, rooms, setR
                         <div key={item._id} style={ item.sender === myName ? { display:'flex', justifyContent: 'right'} : {display:'flex', justifyContent: 'left'}}>
                             { item.sender === myName? 
                             <Alert ref={dummyDiv} style={{padding:'.5rem', paddingBottom:'0px', minWidth:'90px', maxWidth:'180px'}} variant={'success'}>
-                                <h4 style={{fontSize: '1rem', fontWeight:'bolder'}}>{item.sender}</h4>
+                                <h4 style={{fontSize: '1rem', fontWeight:'bolder', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow:'ellipsis'}}>{item.sender}</h4>
                                 <p>{item.message}</p>
                             </Alert>
                             :
                             <Alert ref={dummyDiv} style={{padding:'.5rem', paddingBottom:'0px', minWidth:'90px', maxWidth:'180px'}} variant={'info'}>
-                                <h4 style={{fontSize: '1rem', fontWeight:'bolder'}}>{item.sender}</h4>
+                                <h4 style={{fontSize: '1rem', fontWeight:'bolder', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow:'ellipsis'}}>{item.sender}</h4>
                                 <p>{item.message}</p>
                             </Alert>
                             }
