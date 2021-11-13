@@ -7,7 +7,7 @@ import {
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import {Container} from 'react-bootstrap'
+import {Container, Toast} from 'react-bootstrap'
 import io from 'socket.io-client'
 
 import Home from './pages/Home';
@@ -47,10 +47,15 @@ const socket = io.connect("/")
 function App() {
 
   const [displayChat, setDisplayChat] = useState([])
+  const [inbox, setInbox] = useState({})
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
     socket.on("get_notification", (data) => {
-      console.log(data.room)
+      console.log(data)
+
+      setInbox(data)
+      setShow(true)
 
       localStorage.setItem(`${data.room}-CurrentLength`, data.listSize)
     })
@@ -60,6 +65,18 @@ function App() {
     <ApolloProvider client={client}>
       <Router>
         <Container>
+          {/* {inbox !== {}? */}
+          {/* <Toast style ={{position:'fixed', top: '0', right: '0', marginTop:'10px', marginRight: '10px'}}>
+            <Toast.Header>
+              <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
+              <strong className="me-auto">{inbox.sender}</strong>
+              <small>{`room: ${inbox.room}`}</small>
+            </Toast.Header>
+            <Toast.Body>{inbox.message}</Toast.Body>
+          </Toast> */}
+          {/* :
+          <></>
+          } */}
           <Header />
           <div className="container">
             <Route exact path="/">
@@ -76,6 +93,18 @@ function App() {
             </Route>
           </div>
           <Footer/>
+          {inbox.room !== undefined?(
+          <Toast style ={{position:'fixed', top: '0', right: '0', marginTop:'10px', marginRight: '10px'}} onClose={() => setShow(false)} show={show} delay={4000} autohide>
+            <Toast.Header>
+              <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
+              <strong className="me-auto">{inbox.sender}</strong>
+              <small>{`room: ${inbox.room}`}</small>
+            </Toast.Header>
+            <Toast.Body>{inbox.message}</Toast.Body>
+          </Toast>
+          ):(
+          <></>
+          )}
          </Container>
       </Router>
     </ApolloProvider>

@@ -8,7 +8,7 @@ import { LocalState } from '@apollo/client/core/LocalState'
 
 const Chat = ({displayChat, setDisplayChat, socket, myName, room, rooms, setRoom, client}) => {
 
-    const { loading, data } = useQuery(QUERY_ROOM, {variables:{ roomname: room }})
+    const { loading, data, refetch } = useQuery(QUERY_ROOM, {variables:{ roomname: room }})
 
     const roomData = data?.room || {}
     console.log(roomData)
@@ -29,6 +29,8 @@ const Chat = ({displayChat, setDisplayChat, socket, myName, room, rooms, setRoom
       }
 
     const openChat = () => {
+
+        refetch()
 
 
         // socket.emit("join_room", joinData)
