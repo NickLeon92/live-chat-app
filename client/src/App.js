@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ApolloClient,
   InMemoryCache,
@@ -47,6 +47,14 @@ const socket = io.connect("/")
 function App() {
 
   const [displayChat, setDisplayChat] = useState([])
+
+  useEffect(() => {
+    socket.on("get_notification", (data) => {
+      console.log(data.room)
+
+      localStorage.setItem(`${data.room}-CurrentLength`, data.listSize)
+    })
+  },[socket])
 
   return (
     <ApolloProvider client={client}>

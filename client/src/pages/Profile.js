@@ -69,7 +69,7 @@ const Profile = ({displayChat, setDisplayChat, client, socket}) => {
 
     if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
       
-      // socket.emit("join_room", roomRef.current.value)
+      socket.emit("join_room", joinData)
       try {
         const { data } = await addRoom({
           variables: { roomname: roomRef.current.value }
@@ -79,12 +79,12 @@ const Profile = ({displayChat, setDisplayChat, client, socket}) => {
       }
       
       setRoom((item)=> [ ...item, roomRef.current.value])
+      setDisplayChat((item) => {
+        const check = item.filter(el => el !== roomRef.current.value)
+        return [...check, roomRef.current.value]
+      })
     }
     // socket.emit("join_room", joinData)
-    setDisplayChat((item) => {
-      const check = item.filter(el => el !== roomRef.current.value)
-      return [...check, roomRef.current.value]
-    })
 
 
   }
@@ -125,7 +125,7 @@ const Profile = ({displayChat, setDisplayChat, client, socket}) => {
         <Offcanvas.Body>
         <ListGroup as="ul">
           {room.map((newroom) => {
-            return ( <Chat key={newroom} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={user.rooms} setRoom={setRoom} client={client} />
+            return ( <Chat key={newroom} displayChat={displayChat} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={user.rooms} setRoom={setRoom} client={client} />
                 )
           })}
 
@@ -134,7 +134,7 @@ const Profile = ({displayChat, setDisplayChat, client, socket}) => {
         </Offcanvas>
       <Container style={{ display: 'flex', flexWrap: 'wrap' }}>
         {displayChat.map((newroom) => {
-          return (<Chatbox key={newroom} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={room} setRoom={setRoom} client={client} />)
+          return (<Chatbox key={newroom} displayChat={displayChat} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={room} setRoom={setRoom} client={client} />)
 
         })}
       </Container>

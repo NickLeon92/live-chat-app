@@ -6,7 +6,7 @@ import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
 import { QUERY_ROOMS, QUERY_ME, QUERY_ROOM } from '../utils/queries';
 
 
-function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client}){
+function Chatbox({displayChat, setDisplayChat, socket, myName, room, rooms, setRoom, client}){
 
     const joinData = {
         room: room,
@@ -41,6 +41,7 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
                 message: currentMessage,
                 sender: myName,
                 room: room,
+                listSize: messageHistory.length + 1
             }
             await socket.emit("send_message", messageData)
             if(messageData.room === room){
@@ -64,6 +65,8 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
                 data: { room: {messages: messageHistory} },
               });
             
+            
+            
         }
     }
 
@@ -71,15 +74,19 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
         // console.log('socket use effect')
         socket.on("get_message", (data) => {
             // console.log('messsage recieved')
-            if(data.room === room)
-            // console.log((item)=> 
-            // [...item, data])
-            setMessageHistory((item)=> [...item, data])
-            client.writeQuery({
-                query: QUERY_ROOM,
-                variables: { roomname: roomData.roomname },
-                data: { room: {messages: messageHistory} },
-              });
+            if(data.room === room){
+                // console.log((item)=> 
+                // [...item, data])
+                setMessageHistory((item)=> [...item, data])
+                client.writeQuery({
+                    query: QUERY_ROOM,
+                    variables: { roomname: roomData.roomname },
+                    data: { room: {messages: messageHistory} },
+                  });
+
+                
+
+            }
 
         })
 
@@ -115,6 +122,10 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
 
     useEffect(() => {
 
+        if(displayChat.includes(room)){
+
+            console.log(displayChat)
+
         socket.on("ping_room", (data) => {
 
             if(data.roomname === room){
@@ -133,6 +144,9 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
 
             
         })
+        }
+
+        if(displayChat.includes(room)){
 
         socket.on("online_users", (data) => {
 
@@ -148,6 +162,7 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
             }
 
         })
+    }
 
         socket.on("disconnected_users", (data) => {
             console.log('user disconnected')
@@ -174,12 +189,15 @@ function Chatbox({setDisplayChat, socket, myName, room, rooms, setRoom, client})
 
         socket.emit("ping_leave", joinData)
 
+        localStorage.setItem(`${room}-MessageLength`, messageHistory.length)
+        localStorage.setItem(`${room}-CurrentLength`, messageHistory.length)
+
     }
 
     useEffect(() => {
         console.log(`user: ${joinData.name}, joining room: ${joinData.room}`)
-        socket.emit("join_room", joinData)
-    },[])
+        socket.emit("init_ping", joinData)
+    },[rooms])
 
     return(
 

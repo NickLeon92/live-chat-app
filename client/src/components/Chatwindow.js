@@ -28,7 +28,8 @@ const Chatwindow = ({setDisplayChat, socket, roomdata, myName}) => {
             room: roomdata.roomname
           }
 
-        // socket.emit("join_room", joinData)
+        socket.emit("join_room", joinData)
+        // socket.emit("init_ping", joinData)
 
         if(!user.rooms.includes(roomdata.roomname)){
             try {

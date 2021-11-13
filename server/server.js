@@ -36,14 +36,29 @@ let x =[];
 io.on("connection", (socket) => {
   console.log(socket.id)
 
+  const key = 'SuperSecretListServeKey'
+
   socket.on("join_room", (data)=>{
     socket.join(data.room)
+    socket.join(data.room+key)
     console.log(`User: ${data.name}, socketID: ${socket.id} has joined room: ${data.room}`)
+    console.log(`User: ${data.name}, socketID: ${socket.id} has joined listServe: ${data.room+key}`)
+    // const userData = {
+    //   username: data.name,
+    //   socketID: socket.id,
+    //   roomname: data.room,
+    // }
+    // socket.to(data.room).emit("ping_room", userData)
+  })
+
+  socket.on("init_ping", (data) => {
+    console.log(`User: ${data.name}, socketID: ${socket.id} has joined chatbox: ${data.room}`)
     const userData = {
       username: data.name,
       socketID: socket.id,
       roomname: data.room,
     }
+
     socket.to(data.room).emit("ping_room", userData)
   })
 
@@ -60,20 +75,24 @@ io.on("connection", (socket) => {
   })
 
   socket.on("ping_leave", (data) => {
-    console.log(`User: ${data.name}, socketID: ${socket.id} has left room ${data.room}`)
+    console.log(`User: ${data.name}, socketID: ${socket.id} has left chatbox ${data.room}`)
     socket.to(data.room).emit("disconnected_users", socket.id)
     socket.leave(data.room)
     
   })
   
-  socket.on("leave_rooms", () => {
+  socket.on("leave_room", (data) => {
     socket.broadcast.emit("disconnected_users", socket.id);
+    console.log(`User: ${data.name}, socketID: ${socket.id} has left room ${data.room}`)
+    socket.leave(data.room)
+    socket.leave(data.room+key)
   })
   
 
   socket.on("send_message", (data)=>{
     console.log(data)
     socket.to(data.room).emit("get_message", data)
+    socket.to(data.room+key).emit("get_notification", data)
     
   })
   
