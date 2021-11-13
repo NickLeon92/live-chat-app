@@ -10,6 +10,7 @@ Socket IO and React powered Chat app with rooms and live messages. Join rooms fr
 
 here's the link to the deployed application: https://realtime-rooms.herokuapp.com/
 
+<img src = ./images\demopic3.JPG>
 <img src = ./images\demopic1.JPG>
 <img src = ./images\demopic2.JPG>
     
