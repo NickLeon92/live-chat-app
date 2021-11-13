@@ -5,7 +5,7 @@ import { ADD_ROOM } from '../utils/mutations';
 import { useMutation, useQuery } from '@apollo/client';
 import { QUERY_ME } from '../utils/queries';
 
-const Chatwindow = ({socket, roomdata, myName}) => {
+const Chatwindow = ({setDisplayChat, socket, roomdata, myName}) => {
     // console.log(roomdata.messages)
 
     const { loading, data } = useQuery( QUERY_ME);
@@ -23,6 +23,14 @@ const Chatwindow = ({socket, roomdata, myName}) => {
 
     const joinThisRoom = async () => {
 
+        const joinData = {
+            name: myName,
+            room: roomdata.roomname
+          }
+
+        socket.emit("join_room", joinData)
+        // socket.emit("init_ping", joinData)
+
         if(!user.rooms.includes(roomdata.roomname)){
             try {
                 const { data } = await addRoom({
@@ -32,6 +40,11 @@ const Chatwindow = ({socket, roomdata, myName}) => {
                 console.error(err)
             }
         }
+
+        setDisplayChat((item) => {
+            const check = item.filter(el => el !== roomdata.roomname)
+            return [...check, roomdata.roomname]
+        })
 
     }
 

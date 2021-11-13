@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useMutation, useQuery } from '@apollo/client';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Form, Button, Offcanvas, ListGroup, Badge } from 'react-bootstrap';
 import Chatbox from '../components/Chatbox'
+import Chat from '../components/Chat'
 import Footer from '../components/Footer'
 
 
@@ -16,9 +17,16 @@ import Auth from '../utils/auth';
 
 // window.location.reload();
 
-const Profile = ({client, socket}) => {
+const Profile = ({displayChat, setDisplayChat, client, socket}) => {
   
   let [room, setRoom] = useState([])
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  
   
   client.writeQuery({
     query: QUERY_ME,
@@ -35,6 +43,8 @@ const Profile = ({client, socket}) => {
   const[addRoom] = useMutation(ADD_ROOM)
   
   const roomRef = useRef()
+
+  console.log(displayChat)
   
   
   useEffect(()=>{
@@ -52,9 +62,14 @@ const Profile = ({client, socket}) => {
 
   const joinRoom = async () => {
     
+    const joinData = {
+      name: user.username,
+      room: roomRef.current.value
+    }
+
     if(roomRef.current.value.length > 0 && !room.includes(roomRef.current.value)){
       
-      // socket.emit("join_room", roomRef.current.value)
+      socket.emit("join_room", joinData)
       try {
         const { data } = await addRoom({
           variables: { roomname: roomRef.current.value }
@@ -62,9 +77,15 @@ const Profile = ({client, socket}) => {
       } catch (err) {
         console.error(err)
       }
+      
+      setRoom((item)=> [ ...item, roomRef.current.value])
+      setDisplayChat((item) => {
+        const check = item.filter(el => el !== roomRef.current.value)
+        return [...check, roomRef.current.value]
+      })
     }
-    
-    setRoom((item)=> [ ...item, roomRef.current.value])
+    // socket.emit("join_room", joinData)
+
 
   }
 
@@ -91,11 +112,29 @@ const Profile = ({client, socket}) => {
         </Form>
 
         <Button type="submit" onClick={joinRoom}>Join</Button>
+        <Button style={{marginLeft:'10px'}} variant="primary" onClick={handleShow}>
+        Room List
+        </Button>
+        
       </Container>
 
+      <Offcanvas show={show} onHide={handleClose}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Your Rooms</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+        <ListGroup as="ul">
+          {room.map((newroom) => {
+            return ( <Chat key={newroom} displayChat={displayChat} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={user.rooms} setRoom={setRoom} client={client} />
+                )
+          })}
+
+        </ListGroup>
+        </Offcanvas.Body>
+        </Offcanvas>
       <Container style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {room.map((newroom) => {
-          return (<Chatbox key={newroom} socket={socket} myName={user.username} room={newroom} rooms={room} setRoom={setRoom} client={client} />)
+        {displayChat.map((newroom) => {
+          return (<Chatbox key={newroom} displayChat={displayChat} setDisplayChat={setDisplayChat} socket={socket} myName={user.username} room={newroom} rooms={room} setRoom={setRoom} client={client} />)
 
         })}
       </Container>

@@ -6,7 +6,7 @@ import { ADD_MESSAGE, REMOVE_ROOM } from '../utils/mutations';
 import { QUERY_ROOMS, QUERY_ME, QUERY_ROOM } from '../utils/queries';
 
 
-function Chatbox({socket, myName, room, rooms, setRoom, client}){
+function Chatbox({displayChat, setDisplayChat, socket, myName, room, rooms, setRoom, client}){
 
     const joinData = {
         room: room,
@@ -27,28 +27,9 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
     const [messageHistory, setMessageHistory] = useState([])
     const [onlineUsers, setOnlineUsers] = useState([])
     const [addMessage] = useMutation(ADD_MESSAGE)
-    const [removeRoom] = useMutation(REMOVE_ROOM
-    //     , {
-    //     // All returning data from Apollo Client queries/mutations return in a `data` field, followed by the the data returned by the request
-    //     update(cache, { data: { removeRoom } }) {
-    //       try {
-    //         const { me } = cache.readQuery({ query: QUERY_ME });
-    
-    //         console.log(me)
-    
-    //         cache.writeQuery({
-    //           query: QUERY_ME,
-    //           data: { me: {rooms: room} },
-    //         });
-            
-    //       } catch (e) {
-    //         console.error(e);
-    //       }
-    //     },
-    //   }
-      )
+    const [removeRoom] = useMutation(REMOVE_ROOM)
 
-    console.log(onlineUsers)
+    // console.log(onlineUsers)
 
     const sendMessage = async () => {
 
@@ -60,6 +41,7 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
                 message: currentMessage,
                 sender: myName,
                 room: room,
+                listSize: messageHistory.length + 1
             }
             await socket.emit("send_message", messageData)
             if(messageData.room === room){
@@ -83,6 +65,8 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
                 data: { room: {messages: messageHistory} },
               });
             
+            
+            
         }
     }
 
@@ -90,15 +74,19 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
         // console.log('socket use effect')
         socket.on("get_message", (data) => {
             // console.log('messsage recieved')
-            if(data.room === room)
-            // console.log((item)=> 
-            // [...item, data])
-            setMessageHistory((item)=> [...item, data])
-            client.writeQuery({
-                query: QUERY_ROOM,
-                variables: { roomname: roomData.roomname },
-                data: { room: {messages: messageHistory} },
-              });
+            if(data.room === room){
+                // console.log((item)=> 
+                // [...item, data])
+                setMessageHistory((item)=> [...item, data])
+                client.writeQuery({
+                    query: QUERY_ROOM,
+                    variables: { roomname: roomData.roomname },
+                    data: { room: {messages: messageHistory} },
+                  });
+
+                
+
+            }
 
         })
 
@@ -134,6 +122,10 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
     useEffect(() => {
 
+        if(displayChat.includes(room)){
+
+            console.log(displayChat)
+
         socket.on("ping_room", (data) => {
 
             if(data.roomname === room){
@@ -152,6 +144,9 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
             
         })
+        }
+
+        if(displayChat.includes(room)){
 
         socket.on("online_users", (data) => {
 
@@ -167,6 +162,7 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
             }
 
         })
+    }
 
         socket.on("disconnected_users", (data) => {
             console.log('user disconnected')
@@ -185,29 +181,22 @@ function Chatbox({socket, myName, room, rooms, setRoom, client}){
 
 
     const handleDelete = async () => {
-        // console.log(rooms)
-        const newRooms = rooms.filter(el => el !== room)
-        // console.log(newRooms)
-        setRoom(newRooms)
 
-        try{ 
-            // console.log('attempting to deleete room...')
-            const { data } = await removeRoom({
-                variables: {
-                    roomname: room
-                }
-            })
-        } catch(err) {
-            console.error(err)
-        }
+        setDisplayChat((item) => {
+            const check = item.filter(el => el !== room)
+            return check
+        })
 
         socket.emit("ping_leave", joinData)
+
+        localStorage.setItem(`${room}-MessageLength`, messageHistory.length)
+        localStorage.setItem(`${room}-CurrentLength`, messageHistory.length)
 
     }
 
     useEffect(() => {
         console.log(`user: ${joinData.name}, joining room: ${joinData.room}`)
-        socket.emit("join_room", joinData)
+        socket.emit("init_ping", joinData)
     },[rooms])
 
     return(
